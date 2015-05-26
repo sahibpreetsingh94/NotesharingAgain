@@ -27,6 +27,8 @@ public class ViewFaculty extends javax.swing.JFrame {
     public ViewFaculty() {
         initComponents();
         ob = new DBConnect();
+        facultytb.setVisible(false);
+        jButton1.setVisible(false);
         try {
             Statement stmt = ob.conn.createStatement();
             ResultSet rs = stmt.executeQuery("select name from department");
@@ -138,22 +140,24 @@ public class ViewFaculty extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(departmentcb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(63, 63, 63)
-                        .addComponent(coursecb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)))
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(departmentcb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(75, 75, 75)
+                                .addComponent(coursecb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
+                                .addComponent(jButton2)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(175, 175, 175))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(162, 162, 162)
-                .addComponent(jButton1)
-                .addContainerGap(151, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(129, 129, 129)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(99, 99, 99))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -206,26 +210,42 @@ public class ViewFaculty extends javax.swing.JFrame {
     private void coursecbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coursecbActionPerformed
      }//GEN-LAST:event_coursecbActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    void view() {
         al = new ArrayList<>();
         updateTable();
         if (al.size() == 0) {
             JOptionPane.showMessageDialog(this, "No faculty associated with this course");
+            facultytb.setVisible(false);
+            jButton1.setVisible(false);
         } else {
             tm = new MyTableModel((ArrayList<Object>) (Object) al);
             facultytb.setModel(tm);
             tm.fireTableDataChanged();
+            facultytb.setVisible(true);
+            jButton1.setVisible(true);
         }
+    }
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        view();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int id = al.get(facultytb.getSelectedRow()).id;
-        Statement stmt;
-        try {
-            stmt = ob.conn.createStatement();
-            int rs = stmt.executeUpdate("delete from faculty where id = " + id);
-        } catch (SQLException ex) {
-            Logger.getLogger(ViewFaculty.class.getName()).log(Level.SEVERE, null, ex);
+        if (facultytb.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "No Faculty selected");
+        } else {
+            int id = al.get(facultytb.getSelectedRow()).id;
+            Statement stmt;
+            try {
+                stmt = ob.conn.createStatement();
+                int rs = stmt.executeUpdate("delete from faculty where id = " + id);
+                if (rs == 1) {
+                    JOptionPane.showMessageDialog(this, "Selected Faculty has been deleted");
+                    view();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ViewFaculty.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
