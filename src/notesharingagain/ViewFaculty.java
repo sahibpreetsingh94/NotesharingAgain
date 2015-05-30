@@ -185,7 +185,7 @@ public class ViewFaculty extends javax.swing.JFrame {
             Statement stmt = ob.conn.createStatement();
             ResultSet rs = stmt.executeQuery("select name from course where department='" + departmentcb.getSelectedItem() + "'");
             if (rs.next() != false) {
-                coursecb.addItem("Select Course");
+                coursecb.addItem("Course");
                 coursecb.addItem(rs.getString("name"));
 
                 while (rs.next()) {
@@ -227,7 +227,9 @@ public class ViewFaculty extends javax.swing.JFrame {
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        view();
+        if (departmentcb.getSelectedIndex() == 0 || coursecb.getSelectedIndex() == 0) {
+            view();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

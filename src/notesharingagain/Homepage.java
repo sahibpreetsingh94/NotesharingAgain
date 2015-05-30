@@ -5,6 +5,15 @@
  */
 package notesharingagain;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.*;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Sahib
@@ -14,8 +23,33 @@ public class Homepage extends javax.swing.JFrame {
     /**
      * Creates new form Homepage
      */
+    ServerSocket sersock;
+
     public Homepage() {
         initComponents();
+        try {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        sersock = new ServerSocket(65000);
+                        System.out.println("Server started");
+                        while (true) {
+                            Socket sock = sersock.accept();
+                            ClientHandler ch = new ClientHandler(sock);
+                            Thread t = new Thread(ch);
+                            t.start();
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Unable to start thread");
+        }
     }
 
     /**
@@ -88,12 +122,22 @@ public class Homepage extends javax.swing.JFrame {
 
         jButton4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 18)); // NOI18N
         jButton4.setText("VIEW");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
         jLabel4.setText("Faculty");
 
         jButton5.setFont(new java.awt.Font("Microsoft Himalaya", 0, 18)); // NOI18N
         jButton5.setText("ADD");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jButton6.setFont(new java.awt.Font("Microsoft Himalaya", 0, 18)); // NOI18N
         jButton6.setText("VIEW");
@@ -191,7 +235,7 @@ public class Homepage extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        new ViewDepartment().setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -199,12 +243,20 @@ public class Homepage extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
+        new AddStudent().setVisible(true);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-       new AddCourse().setVisible(true);
+        new AddCourse().setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        new AddFaculty().setVisible(true);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        new ViewCourse().setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -258,4 +310,86 @@ public class Homepage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     // End of variables declaration//GEN-END:variables
+
+    private static class ClientHandler implements Runnable {
+
+        Socket sock;
+        DataInputStream dis;
+        DataOutputStream dos;
+        DBConnect ob;
+
+        public ClientHandler(Socket sock) {
+            this.sock = sock;
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.out.println("Connection Accepted");
+                dis = new DataInputStream(sock.getInputStream());
+                dos = new DataOutputStream(sock.getOutputStream());
+                dos.writeBytes("Hello\r\n");
+                //String ClientMessage = dis.readLine();
+                //System.out.println("ClientMessage :" + ClientMessage);
+                ob = new DBConnect();
+                while (true) {
+                    String s = dis.readLine();
+                    if (s.equals("Request Department")) {
+                        try {
+                            Statement stmt = ob.conn.createStatement();
+                            ResultSet rs = stmt.executeQuery("select name from department");
+                            if (rs.next() == true) {
+                                dos.writeBytes("Department March\r\n");
+                                dos.writeBytes(rs.getString("name") + "\r\n");
+                                while (rs.next()) {
+                                    dos.writeBytes(rs.getString("name") + "\r\n");
+                                }
+                                dos.writeBytes("khatam\r\n");
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (s.equals("Request Course")) {
+                        String s1 = dis.readLine();
+                        try {
+                            Statement stmt = ob.conn.createStatement();
+                            ResultSet rs = stmt.executeQuery("select name from course where department = '" + s1 + "'");
+
+                            if (rs.next() == true) {
+                                dos.writeBytes("Course March\r\n");
+                                dos.writeBytes(rs.getString("name") + "\r\n");
+                                while (rs.next()) {
+                                    dos.writeBytes(rs.getString("name") + "\r\n");
+                                }
+                                dos.writeBytes("khatam\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (s.equals("Register Faculty Request")) {
+                        try {
+                            dos.writeBytes(" Register Faculty Request Accepted\r\n");
+                            String name = dis.readLine();
+                            String password = dis.readLine();
+                            String department = dis.readLine();
+                            String course = dis.readLine();
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                            int rs = stmt.executeUpdate("insert into faculty (name, password, department,course) values('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "')");
+                            if(rs == 1) {
+                                dos.writeBytes("Registered successfully\r\n");
+                            } else {
+                                dos.writeBytes("Registration Failed\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }

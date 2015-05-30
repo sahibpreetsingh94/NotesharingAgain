@@ -11,14 +11,15 @@ package notesharingagain;
  */
 public class Department {
 
-    public String name, description, hod, contact, email;
+    public String name,  hod, contact, email, description;
 
     Department(String name, String hod, String contact, String email, String description) {
         this.name = name;
-        this.description = description;
+
         this.hod = hod;
         this.contact = contact;
         this.email = email;
+        this.description = description;
     }
 
     Object getMember(int i) {
