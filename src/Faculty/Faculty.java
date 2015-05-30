@@ -10,8 +10,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.Date;
-import java.sql.Time;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -351,7 +350,8 @@ public class Faculty extends javax.swing.JFrame {
                         dos.writeBytes(passwordtf.getText()+"\r\n");
                         dos.writeBytes(departmentcb.getSelectedItem().toString()+"\r\n");
                         dos.writeBytes(coursecb.getSelectedItem().toString()+"\r\n");
-                        System.out.println(new Date(10));
+                        Date d = new Date();
+                        dos.writeLong(d.getTime());
                         String s1 = dis.readLine();
                         if(s1.equals("Registered Successfully")) {
                             JOptionPane.showMessageDialog(null, "Registered Successfully");
