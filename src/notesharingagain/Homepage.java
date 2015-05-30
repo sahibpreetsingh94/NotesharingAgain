@@ -375,12 +375,19 @@ public class Homepage extends javax.swing.JFrame {
                             String department = dis.readLine();
                             String course = dis.readLine();
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            int rs = stmt.executeUpdate("insert into faculty (name, password, department,course) values('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "')");
+                            long time=dis.readLong();
+                            int rs = stmt.executeUpdate("insert into faculty (name, password, department,course,Timestamp) values('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' ," + time+ ")");
                             if(rs == 1) {
                                 dos.writeBytes("Registered successfully\r\n");
+                                ResultSet rs1= stmt.executeQuery("select id from faculty where Timestamp="+time);
+                                if(rs1.next())
+                                {
+                                    dos.writeInt(rs1.getInt("id"));
+                                }
                             } else {
                                 dos.writeBytes("Registration Failed\r\n");
                             }
+                        
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
