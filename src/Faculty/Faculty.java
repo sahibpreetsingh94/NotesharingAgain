@@ -95,6 +95,11 @@ public class Faculty extends javax.swing.JFrame {
         });
 
         jButton2.setText("Login");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Name");
 
@@ -109,18 +114,8 @@ public class Faculty extends javax.swing.JFrame {
         jLabel6.setText("Department");
 
         departmentcb.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Department" }));
-        departmentcb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                departmentcbActionPerformed(evt);
-            }
-        });
 
         jButton3.setText("REGISTER");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout registerpanLayout = new javax.swing.GroupLayout(registerpan);
         registerpan.setLayout(registerpanLayout);
@@ -314,6 +309,12 @@ public class Faculty extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        loginpan.setVisible(true);
+        setSize(400,310);
+        loginpan.setBounds(100, 10, 390, 200);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     class Receiver implements Runnable {
 
         @Override
@@ -356,15 +357,19 @@ public class Faculty extends javax.swing.JFrame {
                         if(s1.equals("Registered Successfully")) {
                             int id = dis.readInt();
                             JOptionPane.showMessageDialog(null, "Registered Successfully\nYou can login using ID: " + id);
+                            nametf.setText("");
+                            passwordtf.setText("");
+                            confirmtf.setText("");
+                            coursecb.setSelectedIndex(0);
+                            registerpan.setVisible(false);
+                            setSize(400,200);
                         }
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
-
     }
 
     /**
