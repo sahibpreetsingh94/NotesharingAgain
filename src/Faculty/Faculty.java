@@ -320,6 +320,7 @@ public class Faculty extends javax.swing.JFrame {
         registerpan.setVisible(false);
         setSize(400, 310);
         loginpan.setBounds(100, 10, 390, 200);
+        facultytf.requestFocus();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -328,14 +329,14 @@ public class Faculty extends javax.swing.JFrame {
         } else {
             try {
                 facultyid = Integer.parseInt(facultytf.getText());
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Faculty id must be integer");
-            }
-            try {
+                try {
                 dos.writeBytes("Faculty Login Request\r\n");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Connection with server failed");
             }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Faculty id must be integer");
+            } 
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -396,6 +397,13 @@ public class Faculty extends javax.swing.JFrame {
                             dispose();
                             ob = new FacultyHomepage();
                             ob.setVisible(true);
+                            ob.namelb.setText(dis.readLine());
+                            ob.departmentlb.setText(dis.readLine());
+                            ob.courselb.setText(dis.readLine());
+                            ob.emaillb.setText(dis.readLine());
+                            ob.contactlb.setText(dis.readLine());
+                            ob.addresslb.setText(dis.readLine());
+                            ob.qualificationlb.setText(dis.readLine());
                         } else {
                             JOptionPane.showMessageDialog(null, "Invalid FacultyID or Password");
                         }
