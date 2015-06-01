@@ -394,7 +394,7 @@ public class Faculty extends javax.swing.JFrame {
                             setVisible(false);
                             new FacultyHomepage().setVisible(true);
                         } else {
-                            JOptionPane.showMessageDialog(this, "Invalid FacultyID or Password");
+                            JOptionPane.showMessageDialog(null, "Invalid FacultyID or Password");
                         }
                     }
                 }
