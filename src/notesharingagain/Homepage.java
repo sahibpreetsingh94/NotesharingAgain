@@ -24,12 +24,12 @@ public class Homepage extends javax.swing.JFrame {
      * Creates new form Homepage
      */
     ServerSocket sersock;
-
+    
     public Homepage() {
         initComponents();
         try {
             new Thread(new Runnable() {
-
+                
                 @Override
                 public void run() {
                     try {
@@ -40,7 +40,7 @@ public class Homepage extends javax.swing.JFrame {
                             ClientHandler ch = new ClientHandler(sock);
                             Thread t = new Thread(ch);
                             t.start();
-
+                            
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -312,16 +312,16 @@ public class Homepage extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private static class ClientHandler implements Runnable {
-
+        
         Socket sock;
         DataInputStream dis;
         DataOutputStream dos;
         DBConnect ob;
-
+        
         public ClientHandler(Socket sock) {
             this.sock = sock;
         }
-
+        
         @Override
         public void run() {
             try {
@@ -346,7 +346,7 @@ public class Homepage extends javax.swing.JFrame {
                                 }
                                 dos.writeBytes("khatam\r\n");
                             }
-
+                            
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -386,34 +386,35 @@ public class Homepage extends javax.swing.JFrame {
                             } else {
                                 dos.writeBytes("Registration Failed\r\n");
                             }
-
+                            
                         } catch (Exception e) {
                             dos.writeBytes("Registration Failed\r\n");
                         }
-                    }else if(s.equals("Faculty Login Request"))
-                    {
+                    } else if (s.equals("Faculty Login Request")) {
                         
-                        try{
+                        try {
                             dos.writeBytes("Faculty Login Request Accepted\r\n");
-                            int id=dis.readInt();
-                            String password=dis.readLine();
-                            Statement stmt= ob.conn.createStatement();
-                            ResultSet rs=stmt.executeQuery("select * from faculty where id="+id+" and password='"+password+"'");
-                            if(rs.next())
-                            {
+                            int id = dis.readInt();
+                            String password = dis.readLine();
+                            Statement stmt = ob.conn.createStatement();
+                            ResultSet rs = stmt.executeQuery("select * from faculty where id=" + id + " and password='" + password + "'");
+                            if (rs.next()) {
                                 dos.writeBytes("Login Successful\r\n");
                             }
-                        }catch(Exception e)
-                        {
+                            else
+                            {
+                                dos.writeBytes("Login Unsuccessful\r\n");
+                            }
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
-                            
+                        
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            
         }
     }
 }
