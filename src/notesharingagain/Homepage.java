@@ -355,7 +355,6 @@ public class Homepage extends javax.swing.JFrame {
                         try {
                             Statement stmt = ob.conn.createStatement();
                             ResultSet rs = stmt.executeQuery("select name from course where department = '" + s1 + "'");
-
                             if (rs.next() == true) {
                                 dos.writeBytes("Course March\r\n");
                                 dos.writeBytes(rs.getString("name") + "\r\n");
@@ -369,27 +368,27 @@ public class Homepage extends javax.swing.JFrame {
                         }
                     } else if (s.equals("Register Faculty Request")) {
                         try {
-                            dos.writeBytes(" Register Faculty Request Accepted\r\n");
+                            dos.writeBytes("Register Faculty Request Accepted\r\n");
                             String name = dis.readLine();
                             String password = dis.readLine();
                             String department = dis.readLine();
                             String course = dis.readLine();
+                            long time = dis.readLong();
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            long time=dis.readLong();
-                            int rs = stmt.executeUpdate("insert into faculty (name, password, department,course,Timestamp) values('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' ," + time+ ")");
-                            if(rs == 1) {
-                                dos.writeBytes("Registered successfully\r\n");
-                                ResultSet rs1= stmt.executeQuery("select id from faculty where Timestamp="+time);
-                                if(rs1.next())
-                                {
+                            int rs = stmt.executeUpdate("insert into faculty (username, password, department,course,timestamp) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' ," + time + ")");
+                            if (rs == 1) {
+                                dos.writeBytes("Registered Successfully\r\n");
+                                Statement stmt1 = ob.conn.createStatement();
+                                ResultSet rs1 = stmt1.executeQuery("select id from faculty where timestamp = " + time);
+                                if (rs1.next()) {
                                     dos.writeInt(rs1.getInt("id"));
                                 }
                             } else {
                                 dos.writeBytes("Registration Failed\r\n");
                             }
-                        
+
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            dos.writeBytes("Registration Failed\r\n");
                         }
                     }
                 }

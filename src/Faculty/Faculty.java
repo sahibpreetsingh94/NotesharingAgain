@@ -304,6 +304,7 @@ public class Faculty extends javax.swing.JFrame {
             if(passwordtf.getText().equals(confirmtf.getText())){
                 try {
                     dos.writeBytes("Register Faculty Request\r\n");
+                    System.out.println("1");
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Unable to send register request");
                 }
@@ -335,9 +336,7 @@ public class Faculty extends javax.swing.JFrame {
                     } else if (s.equals("Course March")) {
                         coursecb.removeAllItems();
                         coursecb.addItem("Select Course");
-                        dos.writeBytes(s);
                         while (true) {
-                            System.out.println("HELLO");
                             String s1 = dis.readLine();
                             if (s1.equals("khatam")) {
                                 break;
@@ -351,10 +350,12 @@ public class Faculty extends javax.swing.JFrame {
                         dos.writeBytes(departmentcb.getSelectedItem().toString()+"\r\n");
                         dos.writeBytes(coursecb.getSelectedItem().toString()+"\r\n");
                         Date d = new Date();
+                        System.out.println(d.getTime());
                         dos.writeLong(d.getTime());
                         String s1 = dis.readLine();
                         if(s1.equals("Registered Successfully")) {
-                            JOptionPane.showMessageDialog(null, "Registered Successfully");
+                            int id = dis.readInt();
+                            JOptionPane.showMessageDialog(null, "Registered Successfully\nYou can login using ID: " + id);
                         }
                     }
                 }
