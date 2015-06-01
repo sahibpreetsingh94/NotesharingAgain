@@ -27,6 +27,7 @@ public class Faculty extends javax.swing.JFrame {
     Socket sock;
     DataInputStream dis;
     DataOutputStream dos;
+    int facultyid;
 
     public Faculty() {
         initComponents();
@@ -298,10 +299,10 @@ public class Faculty extends javax.swing.JFrame {
     }//GEN-LAST:event_departmentcbActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        if(nametf.getText().equals("") || passwordtf.getText().equals("") || confirmtf.getText().equals("") || departmentcb.getSelectedIndex() == 0 || coursecb.getSelectedIndex() == 0) {
+        if (nametf.getText().equals("") || passwordtf.getText().equals("") || confirmtf.getText().equals("") || departmentcb.getSelectedIndex() == 0 || coursecb.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "All Fields are mandatory");
         } else {
-            if(passwordtf.getText().equals(confirmtf.getText())){
+            if (passwordtf.getText().equals(confirmtf.getText())) {
                 try {
                     dos.writeBytes("Register Faculty Request\r\n");
                 } catch (IOException ex) {
@@ -315,14 +316,19 @@ public class Faculty extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         loginpan.setVisible(true);
-        setSize(400,310);
+        setSize(400, 310);
         loginpan.setBounds(100, 10, 390, 200);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        if(facultytf.getText().equals("") || password1tf.getText().equals("")) {
-            JOptionPane.showMessageDialog(this,"Both fields are mandatory");
+        if (facultytf.getText().equals("") || password1tf.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Both fields are mandatory");
         } else {
+            try {
+                facultyid = Integer.parseInt(facultytf.getText());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Faculty id must be integer");
+            }
             try {
                 dos.writeBytes("Faculty Login Request");
             } catch (IOException ex) {
@@ -361,16 +367,16 @@ public class Faculty extends javax.swing.JFrame {
                                 coursecb.addItem(s1);
                             }
                         }
-                    } else if(s.equals("Register Faculty Request Accepted")) {
-                        dos.writeBytes(nametf.getText()+"\r\n");
-                        dos.writeBytes(passwordtf.getText()+"\r\n");
-                        dos.writeBytes(departmentcb.getSelectedItem().toString()+"\r\n");
-                        dos.writeBytes(coursecb.getSelectedItem().toString()+"\r\n");
+                    } else if (s.equals("Register Faculty Request Accepted")) {
+                        dos.writeBytes(nametf.getText() + "\r\n");
+                        dos.writeBytes(passwordtf.getText() + "\r\n");
+                        dos.writeBytes(departmentcb.getSelectedItem().toString() + "\r\n");
+                        dos.writeBytes(coursecb.getSelectedItem().toString() + "\r\n");
                         Date d = new Date();
                         System.out.println(d.getTime());
                         dos.writeLong(d.getTime());
                         String s1 = dis.readLine();
-                        if(s1.equals("Registered Successfully")) {
+                        if (s1.equals("Registered Successfully")) {
                             int id = dis.readInt();
                             JOptionPane.showMessageDialog(null, "Registered Successfully\nYou can login using ID: " + id);
                             nametf.setText("");
@@ -378,8 +384,11 @@ public class Faculty extends javax.swing.JFrame {
                             confirmtf.setText("");
                             coursecb.setSelectedIndex(0);
                             registerpan.setVisible(false);
-                            setSize(400,200);
+                            setSize(400, 200);
                         }
+                    } else if (s.equals("Faculty Login Request Accepted")) {
+                        dos.writeInt(facultyid);
+                        dos.writeBytes(password1tf.getText() + "\r\n");
                     }
                 }
             } catch (Exception e) {
