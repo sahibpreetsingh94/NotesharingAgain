@@ -390,6 +390,24 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             dos.writeBytes("Registration Failed\r\n");
                         }
+                    }else if(s.equals("Faculty Login Request"))
+                    {
+                        
+                        try{
+                            dos.writeBytes("Faculty Login Request Accepted\r\n");
+                            int id=dis.readInt();
+                            String password=dis.readLine();
+                            Statement stmt= ob.conn.createStatement();
+                            ResultSet rs=stmt.executeQuery("select * from faculty where id="+id+" and password='"+password+"'");
+                            if(rs.next())
+                            {
+                                dos.writeBytes("Login Successful\r\n");
+                            }
+                        }catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                            
                     }
                 }
             } catch (Exception e) {
