@@ -389,6 +389,13 @@ public class Faculty extends javax.swing.JFrame {
                     } else if (s.equals("Faculty Login Request Accepted")) {
                         dos.writeInt(facultyid);
                         dos.writeBytes(password1tf.getText() + "\r\n");
+                        String s1 = dis.readLine();
+                        if(s1.equals("Login Successful")) {
+                            setVisible(false);
+                            new FacultyHomepage().setVisible(true);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Invalid FacultyID or Password");
+                        }
                     }
                 }
             } catch (Exception e) {
