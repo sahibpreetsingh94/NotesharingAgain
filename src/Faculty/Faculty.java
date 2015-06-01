@@ -316,6 +316,7 @@ public class Faculty extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         loginpan.setVisible(true);
+        registerpan.setVisible(false);
         setSize(400, 310);
         loginpan.setBounds(100, 10, 390, 200);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -330,7 +331,7 @@ public class Faculty extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Faculty id must be integer");
             }
             try {
-                dos.writeBytes("Faculty Login Request");
+                dos.writeBytes("Faculty Login Request\r\n");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Connection with server failed");
             }
