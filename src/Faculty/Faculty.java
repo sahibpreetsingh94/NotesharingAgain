@@ -35,7 +35,7 @@ public class Faculty extends javax.swing.JFrame {
         loginpan.setVisible(false);
         facultypan.setVisible(false);
         try {
-            sock = new Socket("192.168.2.2", 65000);
+            sock = new Socket("127.0.0.1", 65000);
             System.out.println("Success");
             dis = new DataInputStream(sock.getInputStream());
             dos = new DataOutputStream(sock.getOutputStream());
