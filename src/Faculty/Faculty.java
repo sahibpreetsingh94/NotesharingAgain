@@ -175,6 +175,11 @@ public class Faculty extends javax.swing.JFrame {
         jLabel8.setText("Password");
 
         jButton4.setText("LOGIN");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout loginpanLayout = new javax.swing.GroupLayout(loginpan);
         loginpan.setLayout(loginpanLayout);
@@ -299,7 +304,6 @@ public class Faculty extends javax.swing.JFrame {
             if(passwordtf.getText().equals(confirmtf.getText())){
                 try {
                     dos.writeBytes("Register Faculty Request\r\n");
-                    System.out.println("1");
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Unable to send register request");
                 }
@@ -314,6 +318,18 @@ public class Faculty extends javax.swing.JFrame {
         setSize(400,310);
         loginpan.setBounds(100, 10, 390, 200);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if(facultytf.getText().equals("") || password1tf.getText().equals("")) {
+            JOptionPane.showMessageDialog(this,"Both fields are mandatory");
+        } else {
+            try {
+                dos.writeBytes("Faculty Login Request");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Connection with server failed");
+            }
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     class Receiver implements Runnable {
 
