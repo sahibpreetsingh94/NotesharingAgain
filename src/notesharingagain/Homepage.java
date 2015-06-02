@@ -399,6 +399,20 @@ public class Homepage extends javax.swing.JFrame {
                             ResultSet rs = stmt.executeQuery("select * from faculty where id=" + id + " and password='" + password + "'");
                             if (rs.next()) {
                                 dos.writeBytes("Login Successful\r\n");
+                            } else {
+                                dos.writeBytes("Login Unsuccessful\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (s.equals("Faculty Data Request")) {
+                        try {
+                            dos.writeBytes("Faculty Data Request Accepted\r\n");
+                            int id = dis.readInt();
+                            System.out.println(id);
+                            Statement stmt = ob.conn.createStatement();
+                            ResultSet rs = stmt.executeQuery("select * from faculty where id=" + id);
+                            if (rs.next()) {
                                 dos.writeBytes(rs.getString("username") + "\r\n");
                                 dos.writeBytes(rs.getString("department") + "\r\n");
                                 dos.writeBytes(rs.getString("course") + "\r\n");
@@ -406,8 +420,6 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes(rs.getString("contact") + "\r\n");
                                 dos.writeBytes(rs.getString("address") + "\r\n");
                                 dos.writeBytes(rs.getString("qualification") + "\r\n");
-                            } else {
-                                dos.writeBytes("Login Unsuccessful\r\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -419,7 +431,7 @@ public class Homepage extends javax.swing.JFrame {
                             String currentpass = dis.readLine();
                             String newpass = dis.readLine();
                             System.out.println("3");
-                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                             ResultSet rs = stmt.executeQuery("select * from faculty where id = " + facultyid + " and password = '" + currentpass + "'");
                             if (rs.next()) {
                                 rs.updateString("password", newpass);
@@ -427,6 +439,24 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes("Password Change Successful\r\n");
                             } else {
                                 dos.writeBytes("Invalid Current Password\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (s.equals("Faculty Edit Profile Request")) {
+                        try {
+                            dos.writeBytes("Faculty Edit Profile Request Accepted\r\n");
+                            int id = dis.readInt();
+                            String email = dis.readLine();
+                            String contact = dis.readLine();
+                            String address = dis.readLine();
+                            String qualification = dis.readLine();
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                            int rs = stmt.executeUpdate("update faculty set email= '" + email + "', contact='" + contact + "', address ='" + address + "', qualification='" + qualification + "' where id=" + id);
+                            if (rs == 1) {
+                                dos.writeBytes("Profile Updated Successfully\r\n");
+                            } else {
+                                dos.writeBytes("Profile Updation Unsuccessful\r\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
