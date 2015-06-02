@@ -29,7 +29,8 @@ public class Faculty extends javax.swing.JFrame {
     DataOutputStream dos;
     int facultyid;
     FacultyHomepage ob;
-
+    ChangePassword ob1;
+    
     public Faculty() {
         initComponents();
         setSize(400, 200);
@@ -330,18 +331,18 @@ public class Faculty extends javax.swing.JFrame {
             try {
                 facultyid = Integer.parseInt(facultytf.getText());
                 try {
-                dos.writeBytes("Faculty Login Request\r\n");
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "Connection with server failed");
-            }
+                    dos.writeBytes("Faculty Login Request\r\n");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Connection with server failed");
+                }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Faculty id must be integer");
-            } 
+            }
         }
     }//GEN-LAST:event_jButton4ActionPerformed
-
+    
     class Receiver implements Runnable {
-
+        
         @Override
         public void run() {
             facultypan.setVisible(true);
@@ -395,17 +396,53 @@ public class Faculty extends javax.swing.JFrame {
                         String s1 = dis.readLine();
                         if (s1.equals("Login Successful")) {
                             dispose();
-                            ob = new FacultyHomepage();
+                            ob = new Faculty.FacultyHomepage();
                             ob.setVisible(true);
                             ob.namelb.setText(dis.readLine());
                             ob.departmentlb.setText(dis.readLine());
                             ob.courselb.setText(dis.readLine());
-                            ob.emaillb.setText(dis.readLine());
-                            ob.contactlb.setText(dis.readLine());
-                            ob.addresslb.setText(dis.readLine());
-                            ob.qualificationlb.setText(dis.readLine());
+                            String email = dis.readLine();
+                            if (!email.equals("null")) {
+                                ob.emaillb.setText(email);
+                            } else {
+                                ob.emaillb.setText("      --");
+                            }
+                            String contact = dis.readLine();
+                            if (!contact.equals("null")) {
+                                ob.contactlb.setText(contact);
+                            } else {
+                                ob.contactlb.setText("      --");
+                            }
+                            String address = dis.readLine();
+                            if (!address.equals("null")) {
+                                ob.addresslb.setText(address);
+                            } else {
+                                ob.addresslb.setText("      --");
+                            }
+                            String qualification = dis.readLine();
+                            if (!qualification.equals("null")) {
+                                ob.qualificationlb.setText(qualification);
+                            } else {
+                                ob.qualificationlb.setText("      --");
+                            }
                         } else {
                             JOptionPane.showMessageDialog(null, "Invalid FacultyID or Password");
+                        }
+                    } else if (s.equals("Faculty Change Password Request Accepted")) {
+                        try {
+                            dos.writeInt(facultyid);
+                            dos.writeBytes(ob1.currentpasstf.getText() + "\r\n");
+                            dos.writeBytes(ob1.newpasstf.getText() + "\r\n");
+                            String s2 = dis.readLine();
+                            System.out.println(s2);
+                            if(s2.equals("Password Change Successful")) {
+                                JOptionPane.showMessageDialog(null, "Password Change Successful");
+                                ob1.dispose();
+                            } else if(s2.equals("Invalid Current Password")){
+                                JOptionPane.showMessageDialog(null, "Invalid Current Password");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -414,7 +451,7 @@ public class Faculty extends javax.swing.JFrame {
             }
         }
     }
-
+    
     public class FacultyHomepage extends javax.swing.JFrame {
 
         /**
@@ -432,10 +469,9 @@ public class Faculty extends javax.swing.JFrame {
         @SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
         private void initComponents() {
-
-            photopan = new javax.swing.JPanel();
-            photolb = new javax.swing.JLabel();
+            
             jLabel1 = new javax.swing.JLabel();
+            jPanel1 = new javax.swing.JPanel();
             jLabel2 = new javax.swing.JLabel();
             jLabel3 = new javax.swing.JLabel();
             jLabel4 = new javax.swing.JLabel();
@@ -443,6 +479,7 @@ public class Faculty extends javax.swing.JFrame {
             jLabel6 = new javax.swing.JLabel();
             jLabel7 = new javax.swing.JLabel();
             jLabel8 = new javax.swing.JLabel();
+            jLabel9 = new javax.swing.JLabel();
             qualificationlb = new javax.swing.JLabel();
             addresslb = new javax.swing.JLabel();
             contactlb = new javax.swing.JLabel();
@@ -455,183 +492,243 @@ public class Faculty extends javax.swing.JFrame {
             jButton3 = new javax.swing.JButton();
             jButton4 = new javax.swing.JButton();
             jButton5 = new javax.swing.JButton();
-
+            jButton6 = new javax.swing.JButton();
+            
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-            photolb.setText("Photo Here");
-
-            javax.swing.GroupLayout photopanLayout = new javax.swing.GroupLayout(photopan);
-            photopan.setLayout(photopanLayout);
-            photopanLayout.setHorizontalGroup(
-                    photopanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(photopanLayout.createSequentialGroup()
+            
+            jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
+            jLabel1.setText("FACULTY HOMEPAGE");
+            
+            jLabel2.setText("Photo Here");
+            
+            javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(photolb, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addContainerGap())
+                            .addComponent(jLabel2)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
-            photopanLayout.setVerticalGroup(
-                    photopanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(photopanLayout.createSequentialGroup()
+            jPanel1Layout.setVerticalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(photolb, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
-                            .addContainerGap())
+                            .addComponent(jLabel2)
+                            .addContainerGap(75, Short.MAX_VALUE))
             );
-
-            jLabel1.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel1.setText("Name");
-
-            jLabel2.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
-            jLabel2.setText("FACULTY HOMEPAGE");
-
-            jLabel3.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel3.setText("Department");
-
-            jLabel4.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel4.setText("Course");
-
-            jLabel5.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel5.setText("Email");
-
-            jLabel6.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel6.setText("Contact");
-
-            jLabel7.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel7.setText("Address");
-
-            jLabel8.setFont(new java.awt.Font("Tempus Sans ITC", 0, 16)); // NOI18N
-            jLabel8.setText("Qualification");
-
-            qualificationlb.setText("jLabel9");
-
-            addresslb.setText("jLabel10");
-
-            contactlb.setText("jLabel11");
-
-            emaillb.setText("jLabel12");
-
-            courselb.setText("jLabel13");
-
-            departmentlb.setText("jLabel14");
-
-            namelb.setText("jLabel15");
-
-            jButton1.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            
+            jLabel3.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel3.setText("Name");
+            
+            jLabel4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel4.setText("Department");
+            
+            jLabel5.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel5.setText("Course");
+            
+            jLabel6.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel6.setText("Email");
+            
+            jLabel7.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel7.setText("Contact");
+            
+            jLabel8.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel8.setText("Address");
+            
+            jLabel9.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel9.setText("Qualification");
+            
+            qualificationlb.setText("jLabel10");
+            
+            addresslb.setText("jLabel11");
+            
+            contactlb.setText("jLabel12");
+            
+            emaillb.setText("jLabel13");
+            
+            courselb.setText("jLabel14");
+            
+            departmentlb.setText("jLabel15");
+            
+            namelb.setText("jLabel16");
+            
+            jButton1.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton1.setText("Change Password");
-
-            jButton2.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+            
+            jButton2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton2.setText("Edit Profile");
-
-            jButton3.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
-            jButton3.setText("Edit Profile Photo");
-
-            jButton4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
-            jButton4.setText("Add Notes");
-
-            jButton5.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
-            jButton5.setText("Sign Out");
-
+            jButton2.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+            
+            jButton3.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton3.setText("Edit Profile Pic");
+            jButton3.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton3ActionPerformed(evt);
+                }
+            });
+            
+            jButton4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton4.setText("View History");
+            jButton4.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton4ActionPerformed(evt);
+                }
+            });
+            
+            jButton5.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton5.setText("Add Notes");
+            jButton5.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton5ActionPerformed(evt);
+                }
+            });
+            
+            jButton6.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton6.setText("Sign Out");
+            jButton6.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton6ActionPerformed(evt);
+                }
+            });
+            
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
             getContentPane().setLayout(layout);
             layout.setHorizontalGroup(
                     layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(photopan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel5)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jLabel4)))
-                            .addGap(34, 34, 34)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                            .addComponent(courselb)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 150, Short.MAX_VALUE)
-                                            .addComponent(jButton3))
-                                    .addGroup(layout.createSequentialGroup()
-                                            .addComponent(emaillb)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                            .addComponent(contactlb)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                            .addComponent(departmentlb)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(18, 18, 18)
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(qualificationlb)
-                                                    .addComponent(addresslb))
-                                            .addGap(0, 0, Short.MAX_VALUE))
+                                                    .addComponent(jLabel9)
+                                                    .addComponent(jLabel8)
+                                                    .addComponent(jLabel7)
+                                                    .addComponent(jLabel6)
+                                                    .addComponent(jLabel5)
+                                                    .addComponent(jLabel4)
+                                                    .addComponent(jLabel3))
+                                            .addGap(18, 18, 18)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(namelb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                                                            .addComponent(jButton1))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(departmentlb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(courselb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(emaillb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(contactlb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(qualificationlb)
+                                                            .addGap(0, 0, Short.MAX_VALUE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addComponent(addresslb)
+                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                            .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                     .addGroup(layout.createSequentialGroup()
-                                            .addComponent(namelb)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                            .addGap(158, 158, 158)
+                                            .addComponent(jLabel1)))
                             .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                            .addGap(170, 170, 170)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             layout.setVerticalGroup(
                     layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(jLabel2)
+                            .addComponent(jLabel1)
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(jLabel1)
+                                                    .addComponent(jLabel3)
                                                     .addComponent(namelb)
                                                     .addComponent(jButton1))
                                             .addGap(18, 18, 18)
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(jLabel4)
                                                     .addComponent(departmentlb)
                                                     .addComponent(jButton2))
                                             .addGap(18, 18, 18)
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                    .addComponent(jLabel4)
+                                                    .addComponent(jLabel5)
                                                     .addComponent(courselb)
-                                                    .addComponent(jButton3)))
-                                    .addComponent(photopan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addComponent(jButton3))
+                                            .addGap(18, 18, 18)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                    .addComponent(jLabel6)
+                                                    .addComponent(emaillb)
+                                                    .addComponent(jButton4))))
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel5)
-                                    .addComponent(emaillb)
-                                    .addComponent(jButton4))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7)
                                     .addComponent(contactlb)
                                     .addComponent(jButton5))
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel7)
-                                    .addComponent(addresslb))
+                                    .addComponent(jLabel8)
+                                    .addComponent(addresslb)
+                                    .addComponent(jButton6))
                             .addGap(18, 18, 18)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel9)
                                     .addComponent(qualificationlb))
                             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
-
+            
             pack();
         }// </editor-fold>                        
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+            ob1 = new Faculty.ChangePassword();
+            ob1.setVisible(true);
+        }
+        
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+        
+        private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+        
+        private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+        
+        private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+        
+        private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
 
         /**
          * @param args the command line arguments
          */
-        
-
         // Variables declaration - do not modify                     
         private javax.swing.JLabel addresslb;
         private javax.swing.JLabel contactlb;
@@ -643,6 +740,7 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JButton jButton3;
         private javax.swing.JButton jButton4;
         private javax.swing.JButton jButton5;
+        private javax.swing.JButton jButton6;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;
@@ -651,11 +749,151 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JLabel jLabel6;
         private javax.swing.JLabel jLabel7;
         private javax.swing.JLabel jLabel8;
+        private javax.swing.JLabel jLabel9;
+        private javax.swing.JPanel jPanel1;
         private javax.swing.JLabel namelb;
-        private javax.swing.JLabel photolb;
-        private javax.swing.JPanel photopan;
         private javax.swing.JLabel qualificationlb;
-    // End of variables declaration                   
+        // End of variables declaration                   
+    }
+    
+    public class ChangePassword extends javax.swing.JFrame {
+
+        /**
+         * Creates new form ChangePassword
+         */
+        public ChangePassword() {
+            initComponents();
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        }
+
+        /**
+         * This method is called from within the constructor to initialize the
+         * form. WARNING: Do NOT modify this code. The content of this method is
+         * always regenerated by the Form Editor.
+         */
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+            
+            jLabel1 = new javax.swing.JLabel();
+            jLabel2 = new javax.swing.JLabel();
+            currentpasstf = new javax.swing.JPasswordField();
+            jLabel3 = new javax.swing.JLabel();
+            newpasstf = new javax.swing.JPasswordField();
+            jLabel4 = new javax.swing.JLabel();
+            confirmpasstf = new javax.swing.JPasswordField();
+            jButton1 = new javax.swing.JButton();
+            
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            
+            jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
+            jLabel1.setText("CHANGE PASSWORD");
+            
+            jLabel2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jLabel2.setText("Current Password");
+            
+            jLabel3.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jLabel3.setText("New Password");
+            
+            jLabel4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jLabel4.setText("Confirm Password");
+            
+            jButton1.setFont(new java.awt.Font("Tekton Pro", 0, 16)); // NOI18N
+            jButton1.setText("OK");
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+            
+            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel3)
+                                                    .addComponent(jLabel4))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                    .addComponent(newpasstf, javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(currentpasstf, javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(confirmpasstf, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addComponent(jLabel2)
+                                            .addGap(0, 0, Short.MAX_VALUE)))
+                            .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGap(0, 58, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(52, 52, 52))
+                    .addGroup(layout.createSequentialGroup()
+                            .addGap(124, 124, 124)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel1)
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(currentpasstf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(newpasstf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel4)
+                                    .addComponent(confirmpasstf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                            .addComponent(jButton1)
+                            .addContainerGap())
+            );
+            
+            pack();
+        }// </editor-fold>                        
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+            if (currentpasstf.getText().equals("") || newpasstf.getText().equals("") || confirmpasstf.getText().equals("")) {
+                JOptionPane.showMessageDialog(this, "All Fields are Mandatory");
+            } else {
+                if (newpasstf.getText().equals(confirmpasstf.getText())) {
+                    if (currentpasstf.getText().equals(newpasstf.getText())) {
+                        JOptionPane.showMessageDialog(this, "New Password must be different from current password");
+                    } else {
+                        try {
+                            dos.writeBytes("Faculty Change Password Request\r\n");
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(this, "Connection Lost");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Confirm password does not match");
+                }
+            }
+        }
+
+        /**
+         * @param args the command line arguments
+         */
+        // Variables declaration - do not modify                     
+        private javax.swing.JPasswordField confirmpasstf;
+        private javax.swing.JPasswordField currentpasstf;
+        private javax.swing.JButton jButton1;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JLabel jLabel3;
+        private javax.swing.JLabel jLabel4;
+        private javax.swing.JPasswordField newpasstf;
+        // End of variables declaration                   
     }
 
     /**
@@ -672,7 +910,7 @@ public class Faculty extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-
+                    
                 }
             }
         } catch (ClassNotFoundException ex) {
