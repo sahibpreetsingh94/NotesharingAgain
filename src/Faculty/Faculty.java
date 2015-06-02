@@ -723,7 +723,8 @@ public class Faculty extends javax.swing.JFrame {
         }
         
         private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob.dispose();
+            new Faculty().setVisible(true);
         }
 
         /**
