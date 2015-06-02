@@ -391,7 +391,6 @@ public class Homepage extends javax.swing.JFrame {
                             dos.writeBytes("Registration Failed\r\n");
                         }
                     } else if (s.equals("Faculty Login Request")) {
-
                         try {
                             dos.writeBytes("Faculty Login Request Accepted\r\n");
                             int id = dis.readInt();
@@ -413,7 +412,25 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
+                    } else if (s.equals("Faculty Change Password Request")) {
+                        try {
+                            dos.writeBytes("Faculty Change Password Request Accepted\r\n");
+                            int facultyid = dis.readInt();
+                            String currentpass = dis.readLine();
+                            String newpass = dis.readLine();
+                            System.out.println("3");
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+                            ResultSet rs = stmt.executeQuery("select * from faculty where id = " + facultyid + " and password = '" + currentpass + "'");
+                            if (rs.next()) {
+                                rs.updateString("password", newpass);
+                                rs.updateRow();
+                                dos.writeBytes("Password Change Successful\r\n");
+                            } else {
+                                dos.writeBytes("Invalid Current Password\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             } catch (Exception e) {
