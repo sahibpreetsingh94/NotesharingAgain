@@ -461,6 +461,26 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    } else if (s.equals("Register Student Request")) {
+                        try {
+                            dos.writeBytes("Register Student Request Accepted\r\n");
+                            System.out.println("1");
+                            String rollno = dis.readLine();
+                            String name = dis.readLine();
+                            String password = dis.readLine();
+                            String department = dis.readLine();
+                            String course = dis.readLine();
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                            int rs = stmt.executeUpdate("insert into student (rollno, name, password, department,course) values ('" + rollno + "' , '" + name + "' , '" + password + "' , '" + department + "' , '" + course + "')");
+                            if (rs == 1) {
+                                dos.writeBytes("Registered Successfully\r\n");
+                            } else {
+                                dos.writeBytes("Registration Failed\r\n");
+                            }
+
+                        } catch (Exception e) {
+                            dos.writeBytes("Registration Failed\r\n");
+                        }
                     }
                 }
             } catch (Exception e) {
