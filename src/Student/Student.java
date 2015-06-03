@@ -23,6 +23,7 @@ public class Student extends javax.swing.JFrame {
     Socket sock;
     DataInputStream dis;
     DataOutputStream dos;
+    StudentClass stu;
 
     /**
      * Creates new form Student
@@ -32,7 +33,7 @@ public class Student extends javax.swing.JFrame {
         setSize(400, 200);
         registerpan.setVisible(false);
         loginpan.setVisible(false);
-
+        stu = new StudentClass();
         try {
             sock = new Socket("127.0.0.1", 65000);
             System.out.println("Success");
@@ -46,6 +47,26 @@ public class Student extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Connection could not be established");
             System.exit(0);
+        }
+    }
+
+    boolean checkRollNo(String rollno) {
+        if (rollno.length() == 11) {
+            try {
+                Date d = new Date();
+                int yr = d.getYear() + 1900;
+                int year = Integer.parseInt(rollno.substring(0, 4));
+                int no = Integer.parseInt(rollno.substring(7));
+                if (year >= yr - 7 && year <= yr && no > 1000) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -199,6 +220,11 @@ public class Student extends javax.swing.JFrame {
 
         jButton2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
         jButton2.setText("LogIn");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
         jLabel7.setText("Roll No");
@@ -208,6 +234,11 @@ public class Student extends javax.swing.JFrame {
 
         jButton4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
         jButton4.setText("LogIn");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout loginpanLayout = new javax.swing.GroupLayout(loginpan);
         loginpan.setLayout(loginpanLayout);
@@ -315,36 +346,47 @@ public class Student extends javax.swing.JFrame {
         if (rollno.equals("") || nametf.getText().equals("") || passwordtf.getText().equals("") || confirmpasstf.getText().equals("") || departmentcb.getSelectedIndex() == 0 || coursecb.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "All Fields are mandatory");
         } else {
-            boolean flag = true;
-            if (rollno.length() == 11) {
-                try {
-                    Date d = new Date();
-                    int yr = d.getYear() + 1900;
-                    System.out.println(yr);
-                    int year = Integer.parseInt(rollno.substring(0, 4));
-                    int no = Integer.parseInt(rollno.substring(7));
-                    if (year >= yr - 7 && year <= yr && no > 1000) {
-                        if (passwordtf.getText().equals(confirmpasstf.getText())) {
-                            try {
-                                dos.writeBytes("Register Student Request\r\n");
-                            } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(this, "Unable to send register request");
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Passwords do not match");
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Roll No not in proper format1");
+            if (checkRollNo(rollno)) {
+                if (passwordtf.getText().equals(confirmpasstf.getText())) {
+                    try {
+                        dos.writeBytes("Register Student Request\r\n");
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Unable to send register request");
                     }
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Roll No not in proper format2");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Passwords do not match");
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Roll No not in proper format3");
+                JOptionPane.showMessageDialog(this, "Roll No not in proper format");
             }
 
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        loginpan.setVisible(true);
+        registerpan.setVisible(false);
+        setSize(400, 310);
+        loginpan.setBounds(100, 10, 390, 200);
+        rollno1tf.requestFocus();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        stu.rollno = rollno1tf.getText();
+        if (stu.rollno.equals("") || password1tf.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Both fields are mandatory");
+        } else {
+            if (checkRollNo(stu.rollno)) {
+                try {
+                    dos.writeBytes("Student Login Request\r\n");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Connection with server failed");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Roll No not in proper format");
+            }
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     class Receiver implements Runnable {
 
@@ -392,63 +434,64 @@ public class Student extends javax.swing.JFrame {
                             registerpan.setVisible(false);
                             setSize(400, 200);
                         }
-                    }/* else if (s.equals("Faculty Login Request Accepted")) {
-                        dos.writeInt(fac.id);
+                    } else if (s.equals("Student Login Request Accepted")) {
+                        dos.writeBytes(stu.rollno+"\r\n");
                         dos.writeBytes(password1tf.getText() + "\r\n");
                         String s1 = dis.readLine();
                         if (s1.equals("Login Successful")) {
                             dispose();
-                            dos.writeBytes("Faculty Data Request\r\n");
+                            dos.writeBytes("Student Data Request\r\n");
                         } else {
-                            JOptionPane.showMessageDialog(ob, "Invalid FacultyID or Password");
+                            JOptionPane.showMessageDialog(null, "Invalid Roll No or Password");
                         }
-                    } else if (s.equals("Faculty Data Request Accepted")) {
-                        dos.writeInt(fac.id);
-                        System.out.println(fac.id);
-                        fac.username = dis.readLine();
-                        fac.department = dis.readLine();
-                        fac.course = dis.readLine();
-                        fac.email = dis.readLine();
-                        fac.contact = dis.readLine();
-                        fac.address = dis.readLine();
-                        fac.qualification = dis.readLine();
-                        ob = new Faculty.FacultyHomepage();
-                        ob.setVisible(true);
-                    } else if (s.equals("Faculty Change Password Request Accepted")) {
-                        try {
-                            dos.writeInt(fac.id);
-                            dos.writeBytes(ob1.currentpasstf.getText() + "\r\n");
-                            dos.writeBytes(ob1.newpasstf.getText() + "\r\n");
-                            String s2 = dis.readLine();
-                            if (s2.equals("Password Change Successful")) {
-                                JOptionPane.showMessageDialog(ob1, "Password Change Successful");
-                                ob1.dispose();
-                            } else if (s2.equals("Invalid Current Password")) {
-                                JOptionPane.showMessageDialog(ob1, "Invalid Current Password");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else if (s.equals("Faculty Edit Profile Request Accepted")) {
-                        try {
-                            dos.writeInt(fac.id);
-                            dos.writeBytes(ob2.emailtf.getText() + "\r\n");
-                            dos.writeBytes(ob2.contacttf.getText() + "\r\n");
-                            dos.writeBytes(ob2.addressta.getText() + "\r\n");
-                            dos.writeBytes(ob2.qualificationta.getText() + "\r\n");
-                            String s1 = dis.readLine();
-                            if (s1.equals("Profile Updated Successfully")) {
-                                JOptionPane.showMessageDialog(ob2, s1);
-                                ob2.dispose();
-                                ob.dispose();
-                                dos.writeBytes("Faculty Data Request\r\n");
-                            } else {
-                                JOptionPane.showMessageDialog(ob2, "Profile Update Failed");;
-                            }
-                        } catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, "Connection Lost");
-                        }
-                    }*/
+                    }/* else if (s.equals("Faculty Data Request Accepted")) {
+                     dos.writeInt(fac.id);
+                     System.out.println(fac.id);
+                     fac.username = dis.readLine();
+                     fac.department = dis.readLine();
+                     fac.course = dis.readLine();
+                     fac.email = dis.readLine();
+                     fac.contact = dis.readLine();
+                     fac.address = dis.readLine();
+                     fac.qualification = dis.readLine();
+                     ob = new Faculty.FacultyHomepage();
+                     ob.setVisible(true);
+                     } else if (s.equals("Faculty Change Password Request Accepted")) {
+                     try {
+                     dos.writeInt(fac.id);
+                     dos.writeBytes(ob1.currentpasstf.getText() + "\r\n");
+                     dos.writeBytes(ob1.newpasstf.getText() + "\r\n");
+                     String s2 = dis.readLine();
+                     if (s2.equals("Password Change Successful")) {
+                     JOptionPane.showMessageDialog(ob1, "Password Change Successful");
+                     ob1.dispose();
+                     } else if (s2.equals("Invalid Current Password")) {
+                     JOptionPane.showMessageDialog(ob1, "Invalid Current Password");
+                     }
+                     } catch (Exception e) {
+                     e.printStackTrace();
+                     }
+                     } else if (s.equals("Faculty Edit Profile Request Accepted")) {
+                     try {
+                     dos.writeInt(fac.id);
+                     dos.writeBytes(ob2.emailtf.getText() + "\r\n");
+                     dos.writeBytes(ob2.contacttf.getText() + "\r\n");
+                     dos.writeBytes(ob2.addressta.getText() + "\r\n");
+                     dos.writeBytes(ob2.qualificationta.getText() + "\r\n");
+                     String s1 = dis.readLine();
+                     if (s1.equals("Profile Updated Successfully")) {
+                     JOptionPane.showMessageDialog(ob2, s1);
+                     ob2.dispose();
+                     ob.dispose();
+                     dos.writeBytes("Faculty Data Request\r\n");
+                     } else {
+                     JOptionPane.showMessageDialog(ob2, "Profile Update Failed");;
+                     }
+                     } catch (Exception e) {
+                     JOptionPane.showMessageDialog(null, "Connection Lost");
+                     }
+                     }*/
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -470,16 +513,21 @@ public class Student extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Student.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Student.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Student.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Student.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Student.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
