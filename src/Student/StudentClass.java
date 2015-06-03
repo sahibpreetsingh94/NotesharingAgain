@@ -11,6 +11,6 @@ package Student;
  */
 public class StudentClass {
 
-    String rollno, name, email, contact, address;
+    String rollno, name, department, course, email, contact, address;
     boolean photo;
 }

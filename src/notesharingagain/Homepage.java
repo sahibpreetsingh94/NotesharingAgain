@@ -496,6 +496,23 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    } else if (s.equals("Student Data Request")) {
+                        try {
+                            dos.writeBytes("Student Data Request Accepted\r\n");
+                            String rollno = dis.readLine();
+                            Statement stmt = ob.conn.createStatement();
+                            ResultSet rs = stmt.executeQuery("select * from student where rollno = '" + rollno + "'");
+                            if (rs.next()) {
+                                dos.writeBytes(rs.getString("name") + "\r\n");
+                                dos.writeBytes(rs.getString("department") + "\r\n");
+                                dos.writeBytes(rs.getString("course") + "\r\n");
+                                dos.writeBytes(rs.getString("email") + "\r\n");
+                                dos.writeBytes(rs.getString("contact") + "\r\n");
+                                dos.writeBytes(rs.getString("address") + "\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             } catch (Exception e) {
