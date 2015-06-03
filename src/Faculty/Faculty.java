@@ -27,18 +27,20 @@ public class Faculty extends javax.swing.JFrame {
     Socket sock;
     DataInputStream dis;
     DataOutputStream dos;
-    int facultyid;
+    FacultyClass fac;
     FacultyHomepage ob;
     ChangePassword ob1;
-    
+    EditProfile ob2;
+
     public Faculty() {
         initComponents();
         setSize(400, 200);
         registerpan.setVisible(false);
         loginpan.setVisible(false);
         facultypan.setVisible(false);
+        fac = new FacultyClass();
         try {
-            sock = new Socket("127.0.0.1", 65000);
+            sock = new Socket("192.168.2.2", 65000);
             System.out.println("Success");
             dis = new DataInputStream(sock.getInputStream());
             dos = new DataOutputStream(sock.getOutputStream());
@@ -329,7 +331,7 @@ public class Faculty extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Both fields are mandatory");
         } else {
             try {
-                facultyid = Integer.parseInt(facultytf.getText());
+                fac.id = Integer.parseInt(facultytf.getText());
                 try {
                     dos.writeBytes("Faculty Login Request\r\n");
                 } catch (IOException ex) {
@@ -340,9 +342,9 @@ public class Faculty extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButton4ActionPerformed
-    
+
     class Receiver implements Runnable {
-        
+
         @Override
         public void run() {
             facultypan.setVisible(true);
@@ -391,58 +393,60 @@ public class Faculty extends javax.swing.JFrame {
                             setSize(400, 200);
                         }
                     } else if (s.equals("Faculty Login Request Accepted")) {
-                        dos.writeInt(facultyid);
+                        dos.writeInt(fac.id);
                         dos.writeBytes(password1tf.getText() + "\r\n");
                         String s1 = dis.readLine();
                         if (s1.equals("Login Successful")) {
                             dispose();
-                            ob = new Faculty.FacultyHomepage();
-                            ob.setVisible(true);
-                            ob.namelb.setText(dis.readLine());
-                            ob.departmentlb.setText(dis.readLine());
-                            ob.courselb.setText(dis.readLine());
-                            String email = dis.readLine();
-                            if (!email.equals("null")) {
-                                ob.emaillb.setText(email);
-                            } else {
-                                ob.emaillb.setText("      --");
-                            }
-                            String contact = dis.readLine();
-                            if (!contact.equals("null")) {
-                                ob.contactlb.setText(contact);
-                            } else {
-                                ob.contactlb.setText("      --");
-                            }
-                            String address = dis.readLine();
-                            if (!address.equals("null")) {
-                                ob.addresslb.setText(address);
-                            } else {
-                                ob.addresslb.setText("      --");
-                            }
-                            String qualification = dis.readLine();
-                            if (!qualification.equals("null")) {
-                                ob.qualificationlb.setText(qualification);
-                            } else {
-                                ob.qualificationlb.setText("      --");
-                            }
+                            dos.writeBytes("Faculty Data Request\r\n");
                         } else {
-                            JOptionPane.showMessageDialog(null, "Invalid FacultyID or Password");
+                            JOptionPane.showMessageDialog(ob, "Invalid FacultyID or Password");
                         }
+                    } else if (s.equals("Faculty Data Request Accepted")) {
+                        dos.writeInt(fac.id);
+                        System.out.println(fac.id);
+                        fac.username = dis.readLine();
+                        fac.department = dis.readLine();
+                        fac.course = dis.readLine();
+                        fac.email = dis.readLine();
+                        fac.contact = dis.readLine();
+                        fac.address = dis.readLine();
+                        fac.qualification = dis.readLine();
+                        ob = new FacultyHomepage();
+                        ob.setVisible(true);
                     } else if (s.equals("Faculty Change Password Request Accepted")) {
                         try {
-                            dos.writeInt(facultyid);
+                            dos.writeInt(fac.id);
                             dos.writeBytes(ob1.currentpasstf.getText() + "\r\n");
                             dos.writeBytes(ob1.newpasstf.getText() + "\r\n");
                             String s2 = dis.readLine();
-                            System.out.println(s2);
-                            if(s2.equals("Password Change Successful")) {
-                                JOptionPane.showMessageDialog(null, "Password Change Successful");
+                            if (s2.equals("Password Change Successful")) {
+                                JOptionPane.showMessageDialog(ob1, "Password Change Successful");
                                 ob1.dispose();
-                            } else if(s2.equals("Invalid Current Password")){
-                                JOptionPane.showMessageDialog(null, "Invalid Current Password");
+                            } else if (s2.equals("Invalid Current Password")) {
+                                JOptionPane.showMessageDialog(ob1, "Invalid Current Password");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+                        }
+                    } else if (s.equals("Faculty Edit Profile Request Accepted")) {
+                        try {
+                            dos.writeInt(fac.id);
+                            dos.writeBytes(ob2.emailtf.getText() + "\r\n");
+                            dos.writeBytes(ob2.contacttf.getText() + "\r\n");
+                            dos.writeBytes(ob2.addressta.getText() + "\r\n");
+                            dos.writeBytes(ob2.qualificationta.getText() + "\r\n");
+                            String s1 = dis.readLine();
+                            if (s1.equals("Profile Updated Successfully")) {
+                                JOptionPane.showMessageDialog(ob2, s1);
+                                ob2.dispose();
+                                ob.dispose();
+                                dos.writeBytes("Faculty Data Request\r\n");
+                            } else {
+                                JOptionPane.showMessageDialog(ob2, "Profile Update Failed");;
+                            }
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, "Connection Lost");
                         }
                     }
                 }
@@ -451,7 +455,7 @@ public class Faculty extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public class FacultyHomepage extends javax.swing.JFrame {
 
         /**
@@ -459,6 +463,30 @@ public class Faculty extends javax.swing.JFrame {
          */
         public FacultyHomepage() {
             initComponents();
+            namelb.setText(fac.username);
+            departmentlb.setText(fac.department);
+            courselb.setText(fac.course);
+            if (!fac.email.equals("null")) {
+                emaillb.setText(fac.email);
+            } else {
+                emaillb.setText("      --");
+            }
+            if (!fac.contact.equals("null")) {
+                contactlb.setText(fac.contact);
+            } else {
+                contactlb.setText("      --");
+            }
+            if (!fac.address.equals("null")) {
+                addresslb.setText(fac.address);
+            } else {
+                addresslb.setText("      --");
+            }
+            if (!fac.qualification.equals("null")) {
+                qualificationlb.setText(fac.qualification);
+            } else {
+                qualificationlb.setText("      --");
+            }
+            setVisible(true);
         }
 
         /**
@@ -469,7 +497,7 @@ public class Faculty extends javax.swing.JFrame {
         @SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
         private void initComponents() {
-            
+
             jLabel1 = new javax.swing.JLabel();
             jPanel1 = new javax.swing.JPanel();
             jLabel2 = new javax.swing.JLabel();
@@ -493,14 +521,14 @@ public class Faculty extends javax.swing.JFrame {
             jButton4 = new javax.swing.JButton();
             jButton5 = new javax.swing.JButton();
             jButton6 = new javax.swing.JButton();
-            
+
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-            
+
             jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
             jLabel1.setText("FACULTY HOMEPAGE");
-            
+
             jLabel2.setText("Photo Here");
-            
+
             javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
@@ -517,42 +545,42 @@ public class Faculty extends javax.swing.JFrame {
                             .addComponent(jLabel2)
                             .addContainerGap(75, Short.MAX_VALUE))
             );
-            
+
             jLabel3.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel3.setText("Name");
-            
+
             jLabel4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel4.setText("Department");
-            
+
             jLabel5.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel5.setText("Course");
-            
+
             jLabel6.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel6.setText("Email");
-            
+
             jLabel7.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel7.setText("Contact");
-            
+
             jLabel8.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel8.setText("Address");
-            
+
             jLabel9.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel9.setText("Qualification");
-            
+
             qualificationlb.setText("jLabel10");
-            
+
             addresslb.setText("jLabel11");
-            
+
             contactlb.setText("jLabel12");
-            
+
             emaillb.setText("jLabel13");
-            
+
             courselb.setText("jLabel14");
-            
+
             departmentlb.setText("jLabel15");
-            
+
             namelb.setText("jLabel16");
-            
+
             jButton1.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton1.setText("Change Password");
             jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -560,7 +588,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton1ActionPerformed(evt);
                 }
             });
-            
+
             jButton2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton2.setText("Edit Profile");
             jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -568,7 +596,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton2ActionPerformed(evt);
                 }
             });
-            
+
             jButton3.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton3.setText("Edit Profile Pic");
             jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -576,7 +604,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton3ActionPerformed(evt);
                 }
             });
-            
+
             jButton4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton4.setText("View History");
             jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -584,7 +612,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton4ActionPerformed(evt);
                 }
             });
-            
+
             jButton5.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton5.setText("Add Notes");
             jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -592,7 +620,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton5ActionPerformed(evt);
                 }
             });
-            
+
             jButton6.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jButton6.setText("Sign Out");
             jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -600,7 +628,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton6ActionPerformed(evt);
                 }
             });
-            
+
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
             getContentPane().setLayout(layout);
             layout.setHorizontalGroup(
@@ -697,7 +725,7 @@ public class Faculty extends javax.swing.JFrame {
                                     .addComponent(qualificationlb))
                             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
-            
+
             pack();
         }// </editor-fold>                        
 
@@ -705,23 +733,24 @@ public class Faculty extends javax.swing.JFrame {
             ob1 = new Faculty.ChangePassword();
             ob1.setVisible(true);
         }
-        
+
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob2 = new Faculty.EditProfile();
+            ob2.setVisible(true);
         }
-        
+
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
             // TODO add your handling code here:
         }
-        
+
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
             // TODO add your handling code here:
         }
-        
+
         private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
             // TODO add your handling code here:
         }
-        
+
         private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
             ob.dispose();
             new Faculty().setVisible(true);
@@ -756,7 +785,7 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JLabel qualificationlb;
         // End of variables declaration                   
     }
-    
+
     public class ChangePassword extends javax.swing.JFrame {
 
         /**
@@ -775,7 +804,7 @@ public class Faculty extends javax.swing.JFrame {
         @SuppressWarnings("unchecked")
         // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
         private void initComponents() {
-            
+
             jLabel1 = new javax.swing.JLabel();
             jLabel2 = new javax.swing.JLabel();
             currentpasstf = new javax.swing.JPasswordField();
@@ -784,21 +813,21 @@ public class Faculty extends javax.swing.JFrame {
             jLabel4 = new javax.swing.JLabel();
             confirmpasstf = new javax.swing.JPasswordField();
             jButton1 = new javax.swing.JButton();
-            
+
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-            
+
             jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
             jLabel1.setText("CHANGE PASSWORD");
-            
+
             jLabel2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jLabel2.setText("Current Password");
-            
+
             jLabel3.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jLabel3.setText("New Password");
-            
+
             jLabel4.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             jLabel4.setText("Confirm Password");
-            
+
             jButton1.setFont(new java.awt.Font("Tekton Pro", 0, 16)); // NOI18N
             jButton1.setText("OK");
             jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -806,7 +835,7 @@ public class Faculty extends javax.swing.JFrame {
                     jButton1ActionPerformed(evt);
                 }
             });
-            
+
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
             getContentPane().setLayout(layout);
             layout.setHorizontalGroup(
@@ -858,7 +887,7 @@ public class Faculty extends javax.swing.JFrame {
                             .addComponent(jButton1)
                             .addContainerGap())
             );
-            
+
             pack();
         }// </editor-fold>                        
 
@@ -897,6 +926,201 @@ public class Faculty extends javax.swing.JFrame {
         // End of variables declaration                   
     }
 
+    public class EditProfile extends javax.swing.JFrame {
+
+        /**
+         * Creates new form EditProfile
+         */
+        public EditProfile() {
+            initComponents();
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            if (!fac.email.equals("null")) {
+                emailtf.setText(fac.email);
+            }
+            if (!fac.contact.equals("null")) {
+                contacttf.setText(fac.contact);
+            }
+            if (!fac.address.equals("null")) {
+                addressta.setText(fac.address);
+            }
+            if (!fac.qualification.equals("null")) {
+                qualificationta.setText(fac.qualification);
+            }
+        }
+
+        /**
+         * This method is called from within the constructor to initialize the
+         * form. WARNING: Do NOT modify this code. The content of this method is
+         * always regenerated by the Form Editor.
+         */
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+
+            jLabel1 = new javax.swing.JLabel();
+            jLabel2 = new javax.swing.JLabel();
+            jLabel3 = new javax.swing.JLabel();
+            jLabel4 = new javax.swing.JLabel();
+            jLabel5 = new javax.swing.JLabel();
+            emailtf = new javax.swing.JTextField();
+            contacttf = new javax.swing.JTextField();
+            jScrollPane1 = new javax.swing.JScrollPane();
+            addressta = new javax.swing.JTextArea();
+            jScrollPane2 = new javax.swing.JScrollPane();
+            qualificationta = new javax.swing.JTextArea();
+            jButton1 = new javax.swing.JButton();
+
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+            jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
+            jLabel1.setText("EDIT PROFILE");
+
+            jLabel2.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel2.setText("Email");
+
+            jLabel3.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel3.setText("Contact");
+
+            jLabel4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel4.setText("Address");
+
+            jLabel5.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel5.setText("Qualification");
+
+            addressta.setColumns(20);
+            addressta.setRows(5);
+            jScrollPane1.setViewportView(addressta);
+
+            qualificationta.setColumns(20);
+            qualificationta.setRows(5);
+            jScrollPane2.setViewportView(qualificationta);
+
+            jButton1.setText("Update");
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+
+            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                            .addGap(75, 75, 75)
+                                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addContainerGap()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel2)
+                                                    .addComponent(jLabel3)
+                                                    .addComponent(jLabel4)
+                                                    .addComponent(jLabel5))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                    .addComponent(contacttf)
+                                                    .addComponent(emailtf)
+                                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                                                    .addComponent(jScrollPane2))))
+                            .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                            .addGap(113, 113, 113)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel1)
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(emailtf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(contacttf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5))
+                            .addGap(18, 18, 18)
+                            .addComponent(jButton1)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+
+            pack();
+        }// </editor-fold>                        
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+            String email = emailtf.getText();
+            String contact = contacttf.getText();
+            String address = addressta.getText();
+            String qual = qualificationta.getText();
+            if (email.equals(fac.email) && contact.equals(fac.contact) && address.equals(fac.address) && qual.equals(fac.qualification)) {
+                JOptionPane.showMessageDialog(this, "You must change atleast one field");
+            } else {
+                boolean flag = true, flag2 = true;
+                if (contact.length() >= 10 && contact.length() <= 12) {
+                    try {
+                        Long.parseLong(contact);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(this, "Contact can contain only digits");
+                        flag = false;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Contact can only contain 10-12 digits");
+                    flag = false;
+                }
+                if (email.contains("@")) {
+                    email = email.substring(email.indexOf('@'));
+                    if (email.contains(".")) {
+                    } else {
+                        flag2 = false;
+                        JOptionPane.showMessageDialog(this, "Email address not valid");
+                    }
+                } else {
+                    flag2 = false;
+                    JOptionPane.showMessageDialog(this, "@ must be included in email");
+                    emailtf.requestFocus();
+                }
+                if (flag && flag2) {
+                    try {
+                        dos.writeBytes("Faculty Edit Profile Request\r\n");
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Connection Lost");
+                    }
+                }
+            }
+        }
+
+        /**
+         * @param args the command line arguments
+         */
+        // Variables declaration - do not modify                     
+        private javax.swing.JTextArea addressta;
+        private javax.swing.JTextField contacttf;
+        private javax.swing.JTextField emailtf;
+        private javax.swing.JButton jButton1;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JLabel jLabel3;
+        private javax.swing.JLabel jLabel4;
+        private javax.swing.JLabel jLabel5;
+        private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JScrollPane jScrollPane2;
+        private javax.swing.JTextArea qualificationta;
+        // End of variables declaration                   
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -911,7 +1135,7 @@ public class Faculty extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-                    
+
                 }
             }
         } catch (ClassNotFoundException ex) {
