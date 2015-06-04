@@ -464,17 +464,20 @@ public class Homepage extends javax.swing.JFrame {
                     } else if (s.equals("Register Student Request")) {
                         try {
                             dos.writeBytes("Register Student Request Accepted\r\n");
-                            System.out.println("1");
+
                             String rollno = dis.readLine();
                             String name = dis.readLine();
                             String password = dis.readLine();
                             String department = dis.readLine();
                             String course = dis.readLine();
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            int rs = stmt.executeUpdate("insert into student (rollno, name, password, department,course) values ('" + rollno + "' , '" + name + "' , '" + password + "' , '" + department + "' , '" + course + "')");
+
+                            int rs = stmt.executeUpdate("insert into student (rollno,name,password,department,course) values ('" + rollno + "' , '" + name + "' , '" + password + "' , '" + department + "' , '" + course + "')");
+
                             if (rs == 1) {
                                 dos.writeBytes("Registered Successfully\r\n");
                             } else {
+
                                 dos.writeBytes("Registration Failed\r\n");
                             }
 
@@ -509,6 +512,40 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes(rs.getString("email") + "\r\n");
                                 dos.writeBytes(rs.getString("contact") + "\r\n");
                                 dos.writeBytes(rs.getString("address") + "\r\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else if (s.equals("Student Change Password Request")) {
+                        try {
+                            dos.writeBytes("Student Change Password Request Accepted\r\n");
+                            String rollno = dis.readLine();
+                            String currentpass = dis.readLine();
+                            String newpass = dis.readLine();
+                            Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                            int rs = stmt.executeUpdate("update student set password='" + newpass + "' where rollno='" + rollno + "'  and password='" + currentpass + "'");
+                            if (rs == 1) {
+                                dos.writeBytes("Password Change Successful\r\n");
+                            } else {
+                                dos.writeBytes("Password Change Unsuccessful\r\n");
+                            }
+                        } catch (Exception e) {
+                            dos.writeBytes("Invalid Current Password\r\n");
+                        }
+                    } else if (s.equals("Student Edit Profile Request")) {
+                        try {
+                            dos.writeBytes("Student Edit Profile Request Accepted\r\n");
+                            String rollno = dis.readLine();
+                            String email = dis.readLine();
+                            String contact = dis.readLine();
+                            String address = dis.readLine();
+                            Statement stmt = ob.conn.createStatement();
+                            int rs = stmt.executeUpdate("update student set email='" + email + "' and contact='" + contact + "' and address='" + address + "' where rollno='" + rollno + "'");
+                            System.out.println(rs);
+                            if (rs == 1) {
+                                dos.writeBytes("Profile Updated Successfully\r\n");
+                            } else {
+                                dos.writeBytes("Profile Update Failed\r\n");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
