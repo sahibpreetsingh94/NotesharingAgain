@@ -540,7 +540,7 @@ public class Homepage extends javax.swing.JFrame {
                             String contact = dis.readLine();
                             String address = dis.readLine();
                             Statement stmt = ob.conn.createStatement();
-                            int rs = stmt.executeUpdate("update student set email='" + email + "' and contact='" + contact + "' and address='" + address + "' where rollno='" + rollno + "'");
+                            int rs = stmt.executeUpdate("update student set email='"+ email+"' ,contact='"+contact+"' ,address='"+address+"' where rollno='"+rollno+"'");
                             System.out.println(rs);
                             if (rs == 1) {
                                 dos.writeBytes("Profile Updated Successfully\r\n");
