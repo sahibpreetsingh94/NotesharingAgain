@@ -26,6 +26,7 @@ public class ViewFaculty extends javax.swing.JFrame {
 
     public ViewFaculty() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         ob = new DBConnect();
         facultytb.setVisible(false);
         jButton1.setVisible(false);

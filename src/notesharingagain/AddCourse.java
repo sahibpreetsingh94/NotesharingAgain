@@ -19,6 +19,7 @@ public class AddCourse extends javax.swing.JFrame {
      */
     public AddCourse() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         try {
             ob = new DBConnect();
             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);

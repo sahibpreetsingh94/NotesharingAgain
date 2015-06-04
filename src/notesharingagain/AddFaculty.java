@@ -7,6 +7,7 @@ package notesharingagain;
 
 import java.sql.*;
 import javax.swing.JOptionPane;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
@@ -21,6 +22,7 @@ public class AddFaculty extends javax.swing.JFrame {
      */
     public AddFaculty() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         try {
             Statement stmt = ob.conn.createStatement();
             ResultSet rs = stmt.executeQuery("select name from department");
@@ -324,7 +326,7 @@ public class AddFaculty extends javax.swing.JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "faculty could not be added");
-            
+
         }
     }//GEN-LAST:event_departmentcbItemStateChanged
 

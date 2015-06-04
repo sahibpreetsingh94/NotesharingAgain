@@ -25,6 +25,7 @@ public class ViewCourse extends javax.swing.JFrame {
 
     public ViewCourse() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(500, 400);
         jPanel1.setVisible(false);
         al = new ArrayList<>();

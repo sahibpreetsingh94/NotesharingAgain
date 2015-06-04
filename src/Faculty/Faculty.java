@@ -1121,6 +1121,77 @@ public class Faculty extends javax.swing.JFrame {
         // End of variables declaration                   
     }
 
+    public class EditPhoto extends javax.swing.JFrame {
+
+        public EditPhoto() {
+            initComponents();
+        }
+
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+
+            jLabel1 = new javax.swing.JLabel();
+            tfPath = new javax.swing.JTextField();
+            jLabel2 = new javax.swing.JLabel();
+            jButton1 = new javax.swing.JButton();
+            jButton2 = new javax.swing.JButton();
+
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            getContentPane().setLayout(null);
+
+            jLabel1.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
+            jLabel1.setText("Edit Photo");
+            getContentPane().add(jLabel1);
+            jLabel1.setBounds(140, 10, 110, 50);
+            getContentPane().add(tfPath);
+            tfPath.setBounds(90, 70, 190, 30);
+
+            jLabel2.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
+            jLabel2.setText("Source");
+            getContentPane().add(jLabel2);
+            jLabel2.setBounds(10, 70, 60, 30);
+
+            jButton1.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton1.setText("Browse");
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+            getContentPane().add(jButton1);
+            jButton1.setBounds(300, 70, 90, 30);
+
+            jButton2.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
+            jButton2.setText("Upload");
+            jButton2.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+            getContentPane().add(jButton2);
+            jButton2.setBounds(140, 133, 100, 30);
+
+            pack();
+        }// </editor-fold>                        
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+            
+        }
+
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+        
+        }
+
+        // Variables declaration - do not modify                     
+        private javax.swing.JButton jButton1;
+        private javax.swing.JButton jButton2;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JTextField tfPath;
+    // End of variables declaration                   
+    }
+
     /**
      * @param args the command line arguments
      */

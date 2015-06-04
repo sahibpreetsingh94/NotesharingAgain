@@ -26,7 +26,7 @@ public class ViewDepartment extends javax.swing.JFrame {
 
     public ViewDepartment() {
         initComponents();
-
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         updateTable();
         tm = new MyTableModel((ArrayList<Object>) (Object) al);
         departmenttb.setModel(tm);
