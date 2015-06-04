@@ -7,6 +7,9 @@ package notesharingagain;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
@@ -325,10 +328,37 @@ public class Homepage extends javax.swing.JFrame {
         Socket sock;
         DataInputStream dis;
         DataOutputStream dos;
+        FileOutputStream fos;
+        FileInputStream fis;
         DBConnect ob;
+        File f;
 
         public ClientHandler(Socket sock) {
             this.sock = sock;
+
+            f = new File("C:\\pics");
+            if (f.exists()) {
+                f = new File("C:\\pics\\Student");
+                if (f.exists()) {
+                } else {
+                    f.mkdir();
+                }
+                f = new File("C:\\pics\\Faculty");
+                if (f.exists()) {
+                } else {
+                    f.mkdir();
+                }
+            } else {
+                f.mkdir();
+                f = new File("C:\\pics\\Student");
+                f.mkdir();
+                f = new File("C:\\pics\\Faculty");
+                f.mkdir();
+            }
+            f = new File(System.getProperty("user.home") + File.separator + "notes");
+            if (!f.exists()) {
+                f.mkdir();
+            }
         }
 
         @Override
@@ -418,7 +448,7 @@ public class Homepage extends javax.swing.JFrame {
                         try {
                             dos.writeBytes("Faculty Data Request Accepted\r\n");
                             int id = dis.readInt();
-                            System.out.println(id);
+
                             Statement stmt = ob.conn.createStatement();
                             ResultSet rs = stmt.executeQuery("select * from faculty where id=" + id);
                             if (rs.next()) {
@@ -429,6 +459,27 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes(rs.getString("contact") + "\r\n");
                                 dos.writeBytes(rs.getString("address") + "\r\n");
                                 dos.writeBytes(rs.getString("qualification") + "\r\n");
+                                boolean photo = (rs.getInt("Photo") == 0) ? false : true;
+                                System.out.println(photo);
+                                String file = "";
+                                if (!photo) {
+                                    file = "C:\\pics\\default.jpg";
+                                } else {
+                                    file = "C:\\pics\\faculty\\" + id + ".jpg";
+                                }
+                                f = new File(file);
+                                dos.writeLong(f.length());
+                                fis = new FileInputStream(file);
+                                byte b[] = new byte[100000];
+                                int r;
+                                while (true) {
+                                    r = fis.read(b, 0, 100000);
+                                    if (r == -1) {
+                                        break;
+                                    }
+                                    dos.write(b, 0, r);
+                                }
+                                fis.close();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -470,6 +521,25 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    } else if (s.equals("Faculty Profile Pic Coming")) {
+                        dos.writeBytes("Edit Photo Accepted\r\n");
+                        int id = dis.readInt();
+                        long count = 0, size = dis.readLong();
+                        fos = new FileOutputStream("C:\\pics\\Faculty\\" + id + ".jpg");
+                        byte b[] = new byte[100000];
+                        int r;
+                        while (true) {
+                            r = dis.read(b, 0, 100000);
+                            fos.write(b, 0, r);
+                            count += r;
+                            if (count == size) {
+                                break;
+                            }
+                        }
+                        System.out.println(count);
+                        Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        stmt.executeUpdate("update faculty set photo = " + 1 + " where id = " + id);
+                        dos.writeBytes("File Uploaded Successfully\r\n");
                     } else if (s.equals("Register Student Request")) {
                         try {
                             dos.writeBytes("Register Student Request Accepted\r\n");
@@ -550,8 +620,7 @@ public class Homepage extends javax.swing.JFrame {
                             String address = dis.readLine();
                             Statement stmt = ob.conn.createStatement();
 
-                            int rs = stmt.executeUpdate("update student set email='"+ email+"' ,contact='"+contact+"' ,address='"+address+"' where rollno='"+rollno+"'");
-                           
+                            int rs = stmt.executeUpdate("update student set email='" + email + "' ,contact='" + contact + "' ,address='" + address + "' where rollno='" + rollno + "'");
 
                             System.out.println(rs);
                             if (rs == 1) {

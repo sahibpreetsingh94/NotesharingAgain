@@ -6,13 +6,20 @@
 package Faculty;
 
 import com.oracle.jrockit.jfr.ContentType;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -25,12 +32,18 @@ public class Faculty extends javax.swing.JFrame {
      * Creates new form Faculty
      */
     Socket sock;
+    FileInputStream fis;
+    FileOutputStream fos;
     DataInputStream dis;
     DataOutputStream dos;
     FacultyClass fac;
+    Image im;
     FacultyHomepage ob;
     ChangePassword ob1;
     EditProfile ob2;
+    EditPhoto ob3;
+    Long size;
+    String s1 = "";
 
     public Faculty() {
         initComponents();
@@ -40,7 +53,7 @@ public class Faculty extends javax.swing.JFrame {
         facultypan.setVisible(false);
         fac = new FacultyClass();
         try {
-            sock = new Socket("192.168.2.2", 65000);
+            sock = new Socket("127.0.0.1", 65000);
             System.out.println("Success");
             dis = new DataInputStream(sock.getInputStream());
             dos = new DataOutputStream(sock.getOutputStream());
@@ -52,6 +65,11 @@ public class Faculty extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Connection could not be established");
             System.exit(0);
+        }
+        File f = new File("C:\\pics1");
+        if (f.exists()) {
+        } else {
+            f.mkdir();
         }
     }
 
@@ -400,11 +418,10 @@ public class Faculty extends javax.swing.JFrame {
                             dispose();
                             dos.writeBytes("Faculty Data Request\r\n");
                         } else {
-                            JOptionPane.showMessageDialog(ob, "Invalid FacultyID or Password");
+                            JOptionPane.showMessageDialog(null, "Invalid FacultyID or Password");
                         }
                     } else if (s.equals("Faculty Data Request Accepted")) {
                         dos.writeInt(fac.id);
-                        System.out.println(fac.id);
                         fac.username = dis.readLine();
                         fac.department = dis.readLine();
                         fac.course = dis.readLine();
@@ -412,8 +429,23 @@ public class Faculty extends javax.swing.JFrame {
                         fac.contact = dis.readLine();
                         fac.address = dis.readLine();
                         fac.qualification = dis.readLine();
+                        long count = 0, size = dis.readLong();
+                        fos = new FileOutputStream("C:\\pics1\\" + fac.id + ".jpg");
+                        System.out.println(size);
+                        byte[] b = new byte[100000];
+                        int r;
+                        while (count != size) {
+                            r = dis.read(b, 0, 100000);
+                            count += r;
+                            fos.write(b, 0, r);
+                        }
+                        im = ImageIO.read(new File("C:\\pics1\\" + fac.id + ".jpg"));
+
                         ob = new FacultyHomepage();
+                        ob.repaint();
+                        fos.close();
                         ob.setVisible(true);
+                       
                     } else if (s.equals("Faculty Change Password Request Accepted")) {
                         try {
                             dos.writeInt(fac.id);
@@ -447,6 +479,28 @@ public class Faculty extends javax.swing.JFrame {
                             }
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(null, "Connection Lost");
+                        }
+                    } else if (s.equals("Edit Photo Accepted")) {
+                        System.out.println(size);
+                        dos.writeInt(fac.id);
+                        dos.writeLong(size);
+                        fis = new FileInputStream(new File(s1));
+                        byte[] b = new byte[100000];
+                        int r;
+                        while (true) {
+                            r = fis.read(b, 0, 100000);
+                            if (r == -1) {
+                                break;
+                            }
+                            dos.write(b, 0, r);
+                        }
+                        String s1 = dis.readLine();
+                        if (s1.equals("File Uploaded Successfully")) {
+                            JOptionPane.showMessageDialog(ob3, s1);
+                            ob3.dispose();
+                            dos.writeBytes("Faculty Data Request\r\n");
+                            dos.writeInt(fac.id);
+
                         }
                     }
                 }
@@ -487,6 +541,12 @@ public class Faculty extends javax.swing.JFrame {
                 qualificationlb.setText("      --");
             }
             setVisible(true);
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.drawImage(im, 20, 70, 70, 80, null);
         }
 
         /**
@@ -740,7 +800,8 @@ public class Faculty extends javax.swing.JFrame {
         }
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob3 = new EditPhoto();
+            ob3.setVisible(true);
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1123,8 +1184,12 @@ public class Faculty extends javax.swing.JFrame {
 
     public class EditPhoto extends javax.swing.JFrame {
 
+        JFileChooser jfc;
+
         public EditPhoto() {
             initComponents();
+            setSize(450, 300);
+            jfc = new JFileChooser();
         }
 
         @SuppressWarnings("unchecked")
@@ -1176,11 +1241,29 @@ public class Faculty extends javax.swing.JFrame {
         }// </editor-fold>                        
 
         private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-            
+            int i = jfc.showOpenDialog(this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File f = jfc.getSelectedFile();
+                s1 = f.getPath();
+                tfPath.setText(s1);
+                size = f.length();
+            }
         }
 
         private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        
+            if (s1.equals("")) {
+                JOptionPane.showMessageDialog(this, "No Image Selected");
+            } else {
+                if (s1.endsWith(".jpg") || s1.endsWith(".jpeg") || s1.endsWith(".png") || s1.endsWith(".gif")) {
+                    try {
+                        dos.writeBytes("Faculty Profile Pic Coming\r\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Filetype not compatible with predefined. Try .jpg format");
+                }
+            }
         }
 
         // Variables declaration - do not modify                     
@@ -1189,7 +1272,7 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JTextField tfPath;
-    // End of variables declaration                   
+        // End of variables declaration                   
     }
 
     /**
