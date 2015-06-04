@@ -7,18 +7,22 @@ package notesharingagain;
 
 import java.sql.*;
 import javax.swing.JOptionPane;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
  * @author Sahib
  */
 public class AddDepartment extends javax.swing.JFrame {
+
     DBConnect ob = new DBConnect();
+
     /**
      * Creates new form AddDepartment
      */
     public AddDepartment() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     /**

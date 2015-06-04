@@ -28,6 +28,7 @@ public class ViewStudents extends javax.swing.JFrame {
 
     public ViewStudents() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         studenttb.setVisible(false);
         jButton2.setVisible(false);
         ob = new DBConnect();

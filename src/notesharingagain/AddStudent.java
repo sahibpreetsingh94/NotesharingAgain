@@ -21,6 +21,7 @@ public class AddStudent extends javax.swing.JFrame {
      */
     public AddStudent() {
         initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         try {
             ob = new DBConnect();
             Statement stmt = ob.conn.createStatement();
@@ -231,7 +232,7 @@ public class AddStudent extends javax.swing.JFrame {
             if (contact.length() >= 10 && contact.length() <= 12) {
                 try {
                     Long.parseLong(contact);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Contact must contain digits only");
                     flag = false;
                 }
@@ -251,10 +252,10 @@ public class AddStudent extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "@ must be included in email");
                 emailtf.requestFocus();
             }
-            if(flag && flag2) {
+            if (flag && flag2) {
                 try {
                     Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    int rs = stmt.executeUpdate("insert into student (rollno, name, department, course, email, contact, address) values ('" + rollnotf.getText() + "' , '"+ nametf.getText() + "' , '" + departmentcb.getSelectedItem().toString() + "' , '" + coursecb.getSelectedItem().toString() + "' , '" + emailtf.getText() + "' , '" + contact + "' , '"  + addressta.getText() + "')");
+                    int rs = stmt.executeUpdate("insert into student (rollno, name, department, course, email, contact, address) values ('" + rollnotf.getText() + "' , '" + nametf.getText() + "' , '" + departmentcb.getSelectedItem().toString() + "' , '" + coursecb.getSelectedItem().toString() + "' , '" + emailtf.getText() + "' , '" + contact + "' , '" + addressta.getText() + "')");
                     if (rs == 1) {
                         JOptionPane.showMessageDialog(this, "Student Added Successfully");
                         rollnotf.setText("");
@@ -268,7 +269,7 @@ public class AddStudent extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(this, "Roll  No Already Exists");
                     rollnotf.setText("");
                 }
-            
+
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed

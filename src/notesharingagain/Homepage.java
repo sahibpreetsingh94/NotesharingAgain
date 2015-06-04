@@ -160,6 +160,11 @@ public class Homepage extends javax.swing.JFrame {
 
         jButton8.setFont(new java.awt.Font("Microsoft Himalaya", 0, 18)); // NOI18N
         jButton8.setText("VIEW");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -239,7 +244,7 @@ public class Homepage extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
+        new ViewFaculty().setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
@@ -257,6 +262,10 @@ public class Homepage extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         new ViewCourse().setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        new ViewStudents().setVisible(true);
+    }//GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -540,7 +549,10 @@ public class Homepage extends javax.swing.JFrame {
                             String contact = dis.readLine();
                             String address = dis.readLine();
                             Statement stmt = ob.conn.createStatement();
+
                             int rs = stmt.executeUpdate("update student set email='"+ email+"' ,contact='"+contact+"' ,address='"+address+"' where rollno='"+rollno+"'");
+                           
+
                             System.out.println(rs);
                             if (rs == 1) {
                                 dos.writeBytes("Profile Updated Successfully\r\n");

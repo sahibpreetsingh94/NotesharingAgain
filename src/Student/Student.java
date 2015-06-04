@@ -321,6 +321,7 @@ public class Student extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         registerpan.setVisible(true);
         loginpan.setVisible(false);
+        rollnotf.requestFocus();
         setSize(400, 480);
         try {
             dos.writeBytes("Request Department\r\n");
@@ -509,6 +510,7 @@ public class Student extends javax.swing.JFrame {
          */
         public StudentHomepage() {
             initComponents();
+            setSize(600,460);
             rollnolb.setText(stu.rollno);
             namelb.setText(stu.name);
             departmentlb.setText(stu.department);
