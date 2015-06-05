@@ -372,28 +372,32 @@ public class Homepage extends javax.swing.JFrame {
                 while (true) {
                     String s = dis.readLine();
                     if (s.equals("Request Department")) {
+                        String s1 = dis.readLine();
                         try {
                             Statement stmt = ob.conn.createStatement();
                             ResultSet rs = stmt.executeQuery("select name from department");
                             if (rs.next() == true) {
                                 dos.writeBytes("Department March\r\n");
+                                dos.writeBytes(s1 + "\r\n");
                                 dos.writeBytes(rs.getString("name") + "\r\n");
                                 while (rs.next()) {
                                     dos.writeBytes(rs.getString("name") + "\r\n");
                                 }
                                 dos.writeBytes("khatam\r\n");
                             }
-
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
                     } else if (s.equals("Request Course")) {
                         String s1 = dis.readLine();
+                        String s2=dis.readLine();
                         try {
                             Statement stmt = ob.conn.createStatement();
                             ResultSet rs = stmt.executeQuery("select name from course where department = '" + s1 + "'");
                             if (rs.next() == true) {
                                 dos.writeBytes("Course March\r\n");
+                                dos.writeBytes(s2 + "\r\n");
                                 dos.writeBytes(rs.getString("name") + "\r\n");
                                 while (rs.next()) {
                                     dos.writeBytes(rs.getString("name") + "\r\n");
@@ -405,6 +409,7 @@ public class Homepage extends javax.swing.JFrame {
                         }
                     } else if (s.equals("Register Faculty Request")) {
                         try {
+                            System.out.println(1);
                             dos.writeBytes("Register Faculty Request Accepted\r\n");
                             String name = dis.readLine();
                             String password = dis.readLine();
@@ -550,7 +555,7 @@ public class Homepage extends javax.swing.JFrame {
                             }
                         }
                         fos.close();
-                        
+
                         Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                         stmt.executeUpdate(query);
                         dos.writeBytes("File Uploaded Successfully\r\n");

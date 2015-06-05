@@ -42,6 +42,7 @@ public class Faculty extends javax.swing.JFrame {
     ChangePassword ob1;
     EditProfile ob2;
     EditPhoto ob3;
+    AddNotes ob4;
     Long size;
     String s1 = "";
 
@@ -137,6 +138,11 @@ public class Faculty extends javax.swing.JFrame {
         jLabel6.setText("Department");
 
         departmentcb.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select Department" }));
+        departmentcb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                departmentcbActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("REGISTER");
 
@@ -302,6 +308,7 @@ public class Faculty extends javax.swing.JFrame {
         setSize(400, 420);
         try {
             dos.writeBytes("Request Department\r\n");
+            dos.writeBytes("Homepage Data\r\n");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Could not fetch Sufficient Data");
         }
@@ -312,6 +319,7 @@ public class Faculty extends javax.swing.JFrame {
             if (departmentcb.getSelectedIndex() != 0) {
                 dos.writeBytes("Request Course\r\n");
                 dos.writeBytes(departmentcb.getSelectedItem() + "\r\n");
+                dos.writeBytes("Homepage\r\n");
             } else {
                 coursecb.removeAllItems();
             }
@@ -327,6 +335,7 @@ public class Faculty extends javax.swing.JFrame {
             if (passwordtf.getText().equals(confirmtf.getText())) {
                 try {
                     dos.writeBytes("Register Faculty Request\r\n");
+                    System.out.println("hello");
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Unable to send register request");
                 }
@@ -369,29 +378,62 @@ public class Faculty extends javax.swing.JFrame {
             try {
                 while (true) {
                     String s = dis.readLine();
+                    System.out.println(s);
                     if (s.equals("Department March")) {
-                        departmentcb.removeAllItems();
-                        departmentcb.addItem("Select Department");
-                        while (true) {
-                            String s1 = dis.readLine();
-                            if (s1.equals("khatam")) {
-                                break;
-                            } else {
-                                departmentcb.addItem(s1);
+                        String s5 = dis.readLine();
+                        if (s5.equals("Homepage Data")) {
+                            departmentcb.removeAllItems();
+                            departmentcb.addItem("Select Department");
+                            while (true) {
+                                String s1 = dis.readLine();
+                                if (s1.equals("khatam")) {
+                                    break;
+                                } else {
+                                    departmentcb.addItem(s1);
+                                }
+                            }
+                        } else if (s5.equals("AddNotes Data")) {
+                            ob4.cbDepartment.removeAllItems();
+                            ob4.cbDepartment.addItem("Select Department");
+                            while (true) {
+                                String s6 = dis.readLine();
+                                if (s6.equals("khatam")) {
+                                    break;
+                                } else {
+                                    ob4.cbDepartment.addItem(s6);
+                                }
                             }
                         }
                     } else if (s.equals("Course March")) {
-                        coursecb.removeAllItems();
-                        coursecb.addItem("Select Course");
-                        while (true) {
-                            String s1 = dis.readLine();
-                            if (s1.equals("khatam")) {
-                                break;
-                            } else {
-                                coursecb.addItem(s1);
+                        String s2 = dis.readLine();
+                        if (s2.equals("Homepage")) {
+                            coursecb.removeAllItems();
+                            coursecb.addItem("Select Course");
+                            while (true) {
+                                String s1 = dis.readLine();
+                                if (s1.equals("khatam")) {
+                                    break;
+                                } else {
+                                    coursecb.addItem(s1);
+                                }
+                                System.out.println(s1);
+                            }
+                            System.out.println("heelo");
+                        } else if (s2.equals("AddNotes")) {
+                            ob4.cbCourse.removeAllItems();
+                            ob4.cbCourse.addItem("Select Course");
+                            while (true) {
+                                String s1 = dis.readLine();
+                                if (s1.equals("khatam")) {
+                                    break;
+                                } else {
+                                    ob4.cbCourse.addItem(s1);
+                                }
                             }
                         }
+                        System.out.println("heelo231223");
                     } else if (s.equals("Register Faculty Request Accepted")) {
+                        System.out.println("do");
                         dos.writeBytes(nametf.getText() + "\r\n");
                         dos.writeBytes(passwordtf.getText() + "\r\n");
                         dos.writeBytes(departmentcb.getSelectedItem().toString() + "\r\n");
@@ -445,7 +487,7 @@ public class Faculty extends javax.swing.JFrame {
                         ob.repaint();
                         fos.close();
                         ob.setVisible(true);
-                       
+
                     } else if (s.equals("Faculty Change Password Request Accepted")) {
                         try {
                             dos.writeInt(fac.id);
@@ -805,11 +847,12 @@ public class Faculty extends javax.swing.JFrame {
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+
         }
 
         private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob4 = new AddNotes();
+            ob4.setVisible(true);
         }
 
         private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1272,6 +1315,261 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JTextField tfPath;
+        // End of variables declaration                   
+    }
+
+    public class AddNotes extends javax.swing.JFrame {
+
+        JFileChooser jfc;
+
+        public AddNotes() {
+            initComponents();
+            setSize(500, 600);
+            try {
+                dos.writeBytes("Request Department\r\n");
+                dos.writeBytes("AddNotes Data\r\n");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            cbType.addItem("Audio");
+            cbType.addItem("Video");
+            cbType.addItem("Image");
+            cbType.addItem("PDF");
+        }
+
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+
+            jLabel1 = new javax.swing.JLabel();
+            jLabel2 = new javax.swing.JLabel();
+            jLabel3 = new javax.swing.JLabel();
+            jLabel4 = new javax.swing.JLabel();
+            jLabel5 = new javax.swing.JLabel();
+            jLabel6 = new javax.swing.JLabel();
+            cbDepartment = new javax.swing.JComboBox();
+            cbCourse = new javax.swing.JComboBox();
+            tfTitle = new javax.swing.JTextField();
+            tfDescription = new javax.swing.JTextField();
+            cbType = new javax.swing.JComboBox();
+            btBrowse = new javax.swing.JButton();
+            jScrollPane1 = new javax.swing.JScrollPane();
+            jTable1 = new javax.swing.JTable();
+            jLabel7 = new javax.swing.JLabel();
+            btAdd = new javax.swing.JButton();
+            lbPath = new javax.swing.JLabel();
+            btHistory = new javax.swing.JButton();
+            btSelect = new javax.swing.JButton();
+            btDeselect = new javax.swing.JButton();
+
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            getContentPane().setLayout(null);
+
+            jLabel1.setText("Department");
+            getContentPane().add(jLabel1);
+            jLabel1.setBounds(30, 80, 90, 20);
+
+            jLabel2.setText("Course");
+            getContentPane().add(jLabel2);
+            jLabel2.setBounds(30, 110, 50, 20);
+
+            jLabel3.setText("Title");
+            getContentPane().add(jLabel3);
+            jLabel3.setBounds(30, 150, 40, 20);
+
+            jLabel4.setText("Description");
+            getContentPane().add(jLabel4);
+            jLabel4.setBounds(30, 190, 90, 20);
+
+            jLabel5.setText("Type");
+            getContentPane().add(jLabel5);
+            jLabel5.setBounds(30, 230, 40, 20);
+
+            jLabel6.setText("Select File");
+            getContentPane().add(jLabel6);
+            jLabel6.setBounds(30, 280, 80, 20);
+
+            cbDepartment.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select Department"}));
+            getContentPane().add(cbDepartment);
+            cbDepartment.setBounds(130, 70, 170, 30);
+            cbDepartment.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    cbDepartmentActionPerformed(evt);
+                }
+            });
+
+            cbCourse.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select Course"}));
+            getContentPane().add(cbCourse);
+            cbCourse.setBounds(130, 100, 170, 30);
+            getContentPane().add(tfTitle);
+            tfTitle.setBounds(130, 140, 170, 30);
+            getContentPane().add(tfDescription);
+            tfDescription.setBounds(130, 180, 170, 30);
+
+            cbType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select type"}));
+            cbType.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                    cbTypeItemStateChanged(evt);
+                }
+            });
+            getContentPane().add(cbType);
+            cbType.setBounds(130, 230, 120, 30);
+
+            btBrowse.setText("Browse");
+            btBrowse.setEnabled(false);
+            btBrowse.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btBrowseActionPerformed(evt);
+                }
+            });
+            getContentPane().add(btBrowse);
+            btBrowse.setBounds(330, 283, 90, 30);
+
+            jTable1.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{
+                        {},
+                        {},
+                        {},
+                        {}
+                    },
+                    new String[]{}
+            ));
+            jScrollPane1.setViewportView(jTable1);
+
+            getContentPane().add(jScrollPane1);
+            jScrollPane1.setBounds(20, 330, 410, 120);
+
+            jLabel7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+            jLabel7.setText("Add Notes");
+            getContentPane().add(jLabel7);
+            jLabel7.setBounds(150, 10, 140, 30);
+
+            btAdd.setText("Add");
+            btAdd.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btAddActionPerformed(evt);
+                }
+            });
+            getContentPane().add(btAdd);
+            btAdd.setBounds(210, 540, 51, 23);
+            getContentPane().add(lbPath);
+            lbPath.setBounds(130, 280, 190, 30);
+
+            btHistory.setText("View History");
+            getContentPane().add(btHistory);
+            btHistory.setBounds(293, 20, 120, 30);
+
+            btSelect.setText("Select All");
+            btSelect.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btSelectActionPerformed(evt);
+                }
+            });
+            getContentPane().add(btSelect);
+            btSelect.setBounds(60, 460, 90, 30);
+
+            btDeselect.setText("Deselect All");
+            btDeselect.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btDeselectActionPerformed(evt);
+                }
+            });
+            getContentPane().add(btDeselect);
+            btDeselect.setBounds(283, 460, 110, 30);
+
+            pack();
+        }// </editor-fold>                        
+
+        private void btBrowseActionPerformed(java.awt.event.ActionEvent evt) {
+            jfc = new JFileChooser("c:\\");
+            int i = jfc.showOpenDialog(this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File f = jfc.getSelectedFile();
+                String path = f.getPath();
+                if (cbType.getSelectedIndex() == 1) {
+                    if (path.endsWith(".mp3") || path.endsWith(".wav") || path.endsWith(".wma") || path.endsWith(".ogg")) {
+                        lbPath.setText(path);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid File Selected");
+                    }
+                } else if (cbType.getSelectedIndex() == 2) {
+                    if (path.endsWith(".3gp") || path.endsWith(".mp4") || path.endsWith(".mpeg") || path.endsWith(".avi") || path.endsWith(".mkv")) {
+                        lbPath.setText(path);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid File Selected");
+                    }
+                } else if (cbType.getSelectedIndex() == 3) {
+                    if (path.endsWith(".jpeg") || path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".gif")) {
+                        lbPath.setText(path);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid File Selected");
+                    }
+                } else if (cbType.getSelectedIndex() == 4) {
+                    if (path.endsWith(".pdf")) {
+                        lbPath.setText(path);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid File Selected");
+                    }
+                }
+
+            }
+        }
+
+        private void btAddActionPerformed(java.awt.event.ActionEvent evt) {
+
+        }
+
+        private void cbTypeItemStateChanged(java.awt.event.ItemEvent evt) {
+            if (cbType.getSelectedIndex() == 0) {
+                btBrowse.setEnabled(false);
+            } else {
+                btBrowse.setEnabled(true);
+            }
+        }
+
+        private void cbDepartmentActionPerformed(java.awt.event.ActionEvent evt) {
+            try {
+                if (cbDepartment.getSelectedIndex() != 0) {
+                    dos.writeBytes("Request Course\r\n");
+                    dos.writeBytes(cbDepartment.getSelectedItem() + "\r\n");
+                    dos.writeBytes("AddNotes\r\n");
+                } else {
+                    cbCourse.removeAllItems();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void btSelectActionPerformed(java.awt.event.ActionEvent evt) {
+
+        }
+
+        private void btDeselectActionPerformed(java.awt.event.ActionEvent evt) {
+
+        }
+
+        // Variables declaration - do not modify                     
+        private javax.swing.JButton btAdd;
+        private javax.swing.JButton btBrowse;
+        private javax.swing.JButton btDeselect;
+        private javax.swing.JButton btHistory;
+        private javax.swing.JButton btSelect;
+        private javax.swing.JComboBox cbCourse;
+        private javax.swing.JComboBox cbDepartment;
+        private javax.swing.JComboBox cbType;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JLabel jLabel3;
+        private javax.swing.JLabel jLabel4;
+        private javax.swing.JLabel jLabel5;
+        private javax.swing.JLabel jLabel6;
+        private javax.swing.JLabel jLabel7;
+        private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JTable jTable1;
+        private javax.swing.JLabel lbPath;
+        private javax.swing.JTextField tfDescription;
+        private javax.swing.JTextField tfTitle;
         // End of variables declaration                   
     }
 
