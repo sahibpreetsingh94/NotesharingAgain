@@ -481,7 +481,7 @@ public class Faculty extends javax.swing.JFrame {
                             JOptionPane.showMessageDialog(null, "Connection Lost");
                         }
                     } else if (s.equals("Edit Photo Accepted")) {
-                        System.out.println(size);
+                        dos.writeBytes("Faculty\r\n");
                         dos.writeInt(fac.id);
                         dos.writeLong(size);
                         fis = new FileInputStream(new File(s1));
@@ -1256,7 +1256,7 @@ public class Faculty extends javax.swing.JFrame {
             } else {
                 if (s1.endsWith(".jpg") || s1.endsWith(".jpeg") || s1.endsWith(".png") || s1.endsWith(".gif")) {
                     try {
-                        dos.writeBytes("Faculty Profile Pic Coming\r\n");
+                        dos.writeBytes("Profile Pic Coming\r\n");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

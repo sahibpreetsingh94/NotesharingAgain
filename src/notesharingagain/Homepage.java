@@ -13,8 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -521,11 +519,26 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } else if (s.equals("Faculty Profile Pic Coming")) {
+                    } else if (s.equals("Profile Pic Coming")) {
                         dos.writeBytes("Edit Photo Accepted\r\n");
-                        int id = dis.readInt();
+                        String s3 = dis.readLine();
+                        int id = 0;
+                        String rollno = "";
+                        String s5 = "";
+                        String query = "";
+                        if (s3.equals("Faculty")) {
+                            id = dis.readInt();
+                            s5 = Integer.toString(id);
+                            query = "update faculty set photo = " + 1 + " where id = " + id;
+                        } else if (s3.equals("Student")) {
+                            rollno = dis.readLine();
+                            query = "update student set photo = " + 1 + " where rollno = '" + rollno + "'";
+                            s5 = rollno;
+                        }
                         long count = 0, size = dis.readLong();
-                        fos = new FileOutputStream("C:\\pics\\Faculty\\" + id + ".jpg");
+                        System.out.println("C:\\pics\\" + s3 + "\\" + s5 + ".jpg");
+
+                        fos = new FileOutputStream("C:\\pics\\" + s3 + "\\" + s5 + ".jpg");
                         byte b[] = new byte[100000];
                         int r;
                         while (true) {
@@ -536,9 +549,10 @@ public class Homepage extends javax.swing.JFrame {
                                 break;
                             }
                         }
-                        System.out.println(count);
+                        fos.close();
+                        
                         Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        stmt.executeUpdate("update faculty set photo = " + 1 + " where id = " + id);
+                        stmt.executeUpdate(query);
                         dos.writeBytes("File Uploaded Successfully\r\n");
                     } else if (s.equals("Register Student Request")) {
                         try {
@@ -591,6 +605,26 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes(rs.getString("email") + "\r\n");
                                 dos.writeBytes(rs.getString("contact") + "\r\n");
                                 dos.writeBytes(rs.getString("address") + "\r\n");
+                                boolean photo = (rs.getInt("Photo") == 0) ? false : true;
+                                String file = "";
+                                if (!photo) {
+                                    file = "C:\\pics\\default.jpg";
+                                } else {
+                                    file = "C:\\pics\\student\\" + rollno + ".jpg";
+                                }
+                                f = new File(file);
+                                dos.writeLong(f.length());
+                                fis = new FileInputStream(file);
+                                byte b[] = new byte[100000];
+                                int r;
+                                while (true) {
+                                    r = fis.read(b, 0, 100000);
+                                    if (r == -1) {
+                                        break;
+                                    }
+                                    dos.write(b, 0, r);
+                                }
+                                fis.close();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

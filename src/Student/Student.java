@@ -5,11 +5,20 @@
  */
 package Student;
 
+import Faculty.Faculty;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,10 +30,16 @@ public class Student extends javax.swing.JFrame {
     Socket sock;
     DataInputStream dis;
     DataOutputStream dos;
+    FileInputStream fis;
+    FileOutputStream fos;
     StudentClass stu;
     StudentHomepage ob;
     ChangePassword ob1;
     EditProfile ob2;
+    EditPhoto ob3;
+    String s1 = "";
+    Long size;
+    Image im;
 
     /**
      * Creates new form Student
@@ -48,6 +63,11 @@ public class Student extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Connection could not be established");
             System.exit(0);
+        }
+        File f = new File("C:\\pics1");
+        if (f.exists()) {
+        } else {
+            f.mkdir();
         }
     }
 
@@ -459,8 +479,24 @@ public class Student extends javax.swing.JFrame {
                         stu.email = dis.readLine();
                         stu.contact = dis.readLine();
                         stu.address = dis.readLine();
+                        long count = 0, size = dis.readLong();
+                        fos = new FileOutputStream("C:\\pics1\\" + stu.rollno + ".jpg");
+                        System.out.println(size);
+                        byte[] b = new byte[100000];
+                        int r;
+                        while (count != size) {
+                            r = dis.read(b, 0, 100000);
+                            count += r;
+                            fos.write(b, 0, r);
+                        }
+                        fos.close();
+                        im = ImageIO.read(new File("C:\\pics1\\" + stu.rollno + ".jpg"));
+
                         ob = new Student.StudentHomepage();
+                        ob.repaint();
+
                         ob.setVisible(true);
+
                     } else if (s.equals("Student Change Password Request Accepted")) {
                         try {
                             dos.writeBytes(stu.rollno + "\r\n");
@@ -494,6 +530,28 @@ public class Student extends javax.swing.JFrame {
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(null, "Connection Lost");
                         }
+                    } else if (s.equals("Edit Photo Accepted")) {
+                        dos.writeBytes("Student\r\n");
+                        dos.writeBytes(stu.rollno + "\r\n");
+                        dos.writeLong(size);
+                        fis = new FileInputStream(new File(s1));
+                        byte[] b = new byte[100000];
+                        int r;
+                        while (true) {
+                            r = fis.read(b, 0, 100000);
+                            if (r == -1) {
+                                break;
+                            }
+                            dos.write(b, 0, r);
+                        }
+                        String s1 = dis.readLine();
+                        if (s1.equals("File Uploaded Successfully")) {
+                            JOptionPane.showMessageDialog(ob3, s1);
+                            ob3.dispose();
+                            dos.writeBytes("Student Data Request\r\n");
+                            dos.writeBytes(stu.rollno+"\r\n");
+
+                        }
                     }
 
                 }
@@ -510,7 +568,7 @@ public class Student extends javax.swing.JFrame {
          */
         public StudentHomepage() {
             initComponents();
-            setSize(600,460);
+            setSize(600, 460);
             rollnolb.setText(stu.rollno);
             namelb.setText(stu.name);
             departmentlb.setText(stu.department);
@@ -531,6 +589,12 @@ public class Student extends javax.swing.JFrame {
                 addresslb.setText("      --");
             }
             setVisible(true);
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.drawImage(im, 20, 70, 70, 80, null);
         }
 
         /**
@@ -774,7 +838,8 @@ public class Student extends javax.swing.JFrame {
         }
 
         private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob3 = new Student.EditPhoto();
+            ob3.setVisible(true);
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1145,7 +1210,97 @@ public class Student extends javax.swing.JFrame {
         private javax.swing.JLabel jLabel5;
         private javax.swing.JScrollPane jScrollPane1;
         private javax.swing.JLabel namelb;
-    // End of variables declaration                   
+        // End of variables declaration                   
+    }
+
+    public class EditPhoto extends javax.swing.JFrame {
+
+        JFileChooser jfc;
+
+        public EditPhoto() {
+            initComponents();
+            setSize(450, 300);
+            jfc = new JFileChooser();
+        }
+
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+
+            jLabel1 = new javax.swing.JLabel();
+            tfPath = new javax.swing.JTextField();
+            jLabel2 = new javax.swing.JLabel();
+            jButton1 = new javax.swing.JButton();
+            jButton2 = new javax.swing.JButton();
+
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            getContentPane().setLayout(null);
+
+            jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+            jLabel1.setText("Edit Photo");
+            getContentPane().add(jLabel1);
+            jLabel1.setBounds(140, 10, 110, 50);
+            getContentPane().add(tfPath);
+            tfPath.setBounds(90, 70, 190, 30);
+
+            jLabel2.setText("Source");
+            getContentPane().add(jLabel2);
+            jLabel2.setBounds(10, 70, 60, 30);
+
+            jButton1.setText("Browse");
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+            getContentPane().add(jButton1);
+            jButton1.setBounds(300, 70, 90, 30);
+
+            jButton2.setText("Upload");
+            jButton2.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+            getContentPane().add(jButton2);
+            jButton2.setBounds(140, 133, 100, 30);
+
+            pack();
+        }// </editor-fold>                        
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+            int i = jfc.showOpenDialog(this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File f = jfc.getSelectedFile();
+                s1 = f.getPath();
+                tfPath.setText(s1);
+                size = f.length();
+            }
+        }
+
+        private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+            if (s1.equals("")) {
+                JOptionPane.showMessageDialog(this, "No Image Selected");
+            } else {
+                if (s1.endsWith(".jpg") || s1.endsWith(".jpeg") || s1.endsWith(".png") || s1.endsWith(".gif")) {
+                    try {
+                        dos.writeBytes("Profile Pic Coming\r\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Filetype not compatible with predefined. Try .jpg format");
+                }
+            }
+        }
+
+        // Variables declaration - do not modify                     
+        private javax.swing.JButton jButton1;
+        private javax.swing.JButton jButton2;
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JLabel jLabel2;
+        private javax.swing.JTextField tfPath;
+        // End of variables declaration                   
     }
 
     /**
