@@ -391,7 +391,7 @@ public class Homepage extends javax.swing.JFrame {
 
                     } else if (s.equals("Request Course")) {
                         String s1 = dis.readLine();
-                        String s2=dis.readLine();
+                        String s2 = dis.readLine();
                         try {
                             Statement stmt = ob.conn.createStatement();
                             ResultSet rs = stmt.executeQuery("select name from course where department = '" + s1 + "'");
@@ -416,8 +416,9 @@ public class Homepage extends javax.swing.JFrame {
                             String department = dis.readLine();
                             String course = dis.readLine();
                             long time = dis.readLong();
+                            System.out.println("insert into faculty (name, password, department, course, email, contact, address, qualification, time) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' , '' , '' , '' , '' ," + time + ")");
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            int rs = stmt.executeUpdate("insert into faculty (username, password, department,course,timestamp) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' ," + time + ")");
+                            int rs = stmt.executeUpdate("insert into faculty (username, password, department, course, email, contact, address, qualification, timestamp) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' , '' , '' , '' , '' ," + time + ")");
                             if (rs == 1) {
                                 dos.writeBytes("Registered Successfully\r\n");
                                 Statement stmt1 = ob.conn.createStatement();
@@ -559,6 +560,27 @@ public class Homepage extends javax.swing.JFrame {
                         Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                         stmt.executeUpdate(query);
                         dos.writeBytes("File Uploaded Successfully\r\n");
+                    } else if (s.equals("Request Student Data")) {
+                        dos.writeBytes("Request Student Data Accepted\r\n");
+                        String department = dis.readLine();
+                        String course = dis.readLine();
+                        Statement stmt = ob.conn.createStatement();
+                        ResultSet rs = stmt.executeQuery("select rollno, name, email, contact from student where department = '" + department + "' and course = '" + course + "'");
+                        if (rs.next()) {
+                            dos.writeBytes(rs.getString("rollno") + "\r\n");
+                            dos.writeBytes(rs.getString("name") + "\r\n");
+                            dos.writeBytes(rs.getString("email") + "\r\n");
+                            dos.writeBytes(rs.getString("contact") + "\r\n");
+                            while (rs.next()) {
+                                dos.writeBytes(rs.getString("rollno") + "\r\n");
+                                dos.writeBytes(rs.getString("name") + "\r\n");
+                                dos.writeBytes(rs.getString("email") + "\r\n");
+                                dos.writeBytes(rs.getString("contact") + "\r\n");
+                            }
+                            dos.writeBytes("khatam\r\n");
+                        } else {
+                            dos.writeBytes("khatam\r\n");
+                        }
                     } else if (s.equals("Register Student Request")) {
                         try {
                             dos.writeBytes("Register Student Request Accepted\r\n");
@@ -575,7 +597,6 @@ public class Homepage extends javax.swing.JFrame {
                             if (rs == 1) {
                                 dos.writeBytes("Registered Successfully\r\n");
                             } else {
-
                                 dos.writeBytes("Registration Failed\r\n");
                             }
 

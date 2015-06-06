@@ -15,12 +15,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
 
 /**
  *
@@ -43,6 +45,7 @@ public class Faculty extends javax.swing.JFrame {
     EditProfile ob2;
     EditPhoto ob3;
     AddNotes ob4;
+    ArrayList<StudentData> al;
     Long size;
     String s1 = "";
 
@@ -145,6 +148,11 @@ public class Faculty extends javax.swing.JFrame {
         });
 
         jButton3.setText("REGISTER");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout registerpanLayout = new javax.swing.GroupLayout(registerpan);
         registerpan.setLayout(registerpanLayout);
@@ -334,8 +342,9 @@ public class Faculty extends javax.swing.JFrame {
         } else {
             if (passwordtf.getText().equals(confirmtf.getText())) {
                 try {
+                    System.out.println("hello1");
                     dos.writeBytes("Register Faculty Request\r\n");
-                    System.out.println("hello");
+                    System.out.println("hello2");
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Unable to send register request");
                 }
@@ -487,7 +496,6 @@ public class Faculty extends javax.swing.JFrame {
                         ob.repaint();
                         fos.close();
                         ob.setVisible(true);
-
                     } else if (s.equals("Faculty Change Password Request Accepted")) {
                         try {
                             dos.writeInt(fac.id);
@@ -544,6 +552,21 @@ public class Faculty extends javax.swing.JFrame {
                             dos.writeInt(fac.id);
 
                         }
+                    } else if (s.equals("Request Student Data Accepted")) {
+                        dos.writeBytes(ob4.cbDepartment.getSelectedItem().toString() + "\r\n");
+                        dos.writeBytes(ob4.cbCourse.getSelectedItem().toString() + "\r\n");
+                        while (true) {
+                            String rollno = dis.readLine();
+                            if (!rollno.equals("khatam")) {
+                                String name = dis.readLine();
+                                String email = dis.readLine();
+                                String contact = dis.readLine();
+                                al.add(new StudentData(new Boolean(true), rollno, name, email, contact));
+                            } else {
+                                break;
+                            }
+                        }
+                        ob4.tm.fireTableDataChanged();
                     }
                 }
             } catch (Exception e) {
@@ -562,22 +585,22 @@ public class Faculty extends javax.swing.JFrame {
             namelb.setText(fac.username);
             departmentlb.setText(fac.department);
             courselb.setText(fac.course);
-            if (!fac.email.equals("null")) {
+            if (!fac.email.equals("")) {
                 emaillb.setText(fac.email);
             } else {
                 emaillb.setText("      --");
             }
-            if (!fac.contact.equals("null")) {
+            if (!fac.contact.equals("")) {
                 contactlb.setText(fac.contact);
             } else {
                 contactlb.setText("      --");
             }
-            if (!fac.address.equals("null")) {
+            if (!fac.address.equals("")) {
                 addresslb.setText(fac.address);
             } else {
                 addresslb.setText("      --");
             }
-            if (!fac.qualification.equals("null")) {
+            if (!fac.qualification.equals("")) {
                 qualificationlb.setText(fac.qualification);
             } else {
                 qualificationlb.setText("      --");
@@ -1171,30 +1194,36 @@ public class Faculty extends javax.swing.JFrame {
             String qual = qualificationta.getText();
             if (email.equals(fac.email) && contact.equals(fac.contact) && address.equals(fac.address) && qual.equals(fac.qualification)) {
                 JOptionPane.showMessageDialog(this, "You must change atleast one field");
+                //} else if (emailtf.getText().equals("") && contacttf.getText().equals("") && addressta.getText().equals("") && qualificationta.getText().equals("")) {
+                // JOptionPane.showMessageDialog(this, "Atleast one field must be entered");
             } else {
                 boolean flag = true, flag2 = true;
-                if (contact.length() >= 10 && contact.length() <= 12) {
-                    try {
-                        Long.parseLong(contact);
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(this, "Contact can contain only digits");
+                if (contact.length() != 0) {
+                    if (contact.length() >= 10 && contact.length() <= 12) {
+                        try {
+                            Long.parseLong(contact);
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(this, "Contact can contain only digits");
+                            flag = false;
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Contact can only contain 10-12 digits");
                         flag = false;
                     }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Contact can only contain 10-12 digits");
-                    flag = false;
                 }
-                if (email.contains("@")) {
-                    email = email.substring(email.indexOf('@'));
-                    if (email.contains(".")) {
+                if (email.length() != 0) {
+                    if (email.contains("@")) {
+                        email = email.substring(email.indexOf('@'));
+                        if (email.contains(".")) {
+                        } else {
+                            flag2 = false;
+                            JOptionPane.showMessageDialog(this, "Email address not valid");
+                        }
                     } else {
                         flag2 = false;
-                        JOptionPane.showMessageDialog(this, "Email address not valid");
+                        JOptionPane.showMessageDialog(this, "@ must be included in email");
+                        emailtf.requestFocus();
                     }
-                } else {
-                    flag2 = false;
-                    JOptionPane.showMessageDialog(this, "@ must be included in email");
-                    emailtf.requestFocus();
                 }
                 if (flag && flag2) {
                     try {
@@ -1318,16 +1347,36 @@ public class Faculty extends javax.swing.JFrame {
         // End of variables declaration                   
     }
 
+    class StudentData {
+
+        String rollno, name, email, contact;
+        Boolean cb;
+
+        StudentData(Boolean cb, String r, String n, String e, String c) {
+            rollno = r;
+            name = n;
+            email = e;
+            contact = c;
+            this.cb = cb;
+        }
+    }
+
     public class AddNotes extends javax.swing.JFrame {
 
         JFileChooser jfc;
+        TableModel tm;
 
         public AddNotes() {
             initComponents();
             setSize(500, 600);
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            al = new ArrayList<StudentData>();
+            tm = new TableModel();
+            jTable1.setModel(tm);
             try {
                 dos.writeBytes("Request Department\r\n");
                 dos.writeBytes("AddNotes Data\r\n");
+                System.out.println("789");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1399,6 +1448,11 @@ public class Faculty extends javax.swing.JFrame {
             });
 
             cbCourse.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select Course"}));
+            cbCourse.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    cbCourseActionPerformed(evt);
+                }
+            });
             getContentPane().add(cbCourse);
             cbCourse.setBounds(130, 100, 170, 30);
             getContentPane().add(tfTitle);
@@ -1511,7 +1565,6 @@ public class Faculty extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(this, "Invalid File Selected");
                     }
                 }
-
             }
         }
 
@@ -1533,11 +1586,21 @@ public class Faculty extends javax.swing.JFrame {
                     dos.writeBytes("Request Course\r\n");
                     dos.writeBytes(cbDepartment.getSelectedItem() + "\r\n");
                     dos.writeBytes("AddNotes\r\n");
+                    System.out.println("456");
                 } else {
                     cbCourse.removeAllItems();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+
+        private void cbCourseActionPerformed(java.awt.event.ActionEvent evt) {
+            System.out.println("123");
+            try {
+                //dos.writeBytes("Request Student Data\r\n");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Connection Lost");
             }
         }
 
@@ -1547,6 +1610,61 @@ public class Faculty extends javax.swing.JFrame {
 
         private void btDeselectActionPerformed(java.awt.event.ActionEvent evt) {
 
+        }
+
+        class TableModel extends AbstractTableModel {
+
+            @Override
+            public int getRowCount() {
+                return al.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 5;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                if (columnIndex == 0) {
+                    return al.get(rowIndex).cb;
+                } else if (columnIndex == 1) {
+                    return al.get(rowIndex).rollno;
+                } else if (columnIndex == 2) {
+                    return al.get(rowIndex).name;
+                } else if (columnIndex == 3) {
+                    return al.get(rowIndex).email;
+                } else if (columnIndex == 4) {
+                    return al.get(rowIndex).contact;
+                }
+                return "";
+            }
+
+            @Override
+            public String getColumnName(int column) {
+                String s[] = {"Select Student", "Roll No", "Name", "Email", "Contact"};
+                return s[column];
+            }
+
+            @Override
+            public Class getColumnClass(int c) {
+                return getValueAt(0, c).getClass();
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                al.get(rowIndex).cb = (Boolean) (aValue);
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                if (columnIndex == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
 
         // Variables declaration - do not modify                     
