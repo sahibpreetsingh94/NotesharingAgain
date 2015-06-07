@@ -46,6 +46,7 @@ public class Faculty extends javax.swing.JFrame {
     EditProfile ob2;
     EditPhoto ob3;
     AddNotes ob4;
+    ViewHistory ob5;
     ArrayList<StudentData> al;
     Long size;
     String s1 = "";
@@ -578,9 +579,7 @@ public class Faculty extends javax.swing.JFrame {
                                 dos.writeLong(size);
                                 int i = s3.lastIndexOf(".");
                                 String s1 = s3.substring(i);
-                                System.out.println(s1);
                                 dos.writeBytes(s1 + "\r\n");
-                                System.out.println("size" + size);
 
                                 if (dis.readLine().equals("Get Notes File")) {
                                     fis = new FileInputStream(f);
@@ -590,9 +589,7 @@ public class Faculty extends javax.swing.JFrame {
                                     while (true) {
                                         r = fis.read(b, 0, 1000000);
                                         count = count + r;
-                                        System.out.println("count");
                                         if (r == -1) {
-                                            System.out.println("in break");
                                             break;
                                         }
                                         dos.write(b, 0, r);
@@ -600,7 +597,6 @@ public class Faculty extends javax.swing.JFrame {
                                     fis.close();
                                 }
                                 Thread.sleep(1000);
-
                                 for (StudentData al1 : al) {
                                     if (al1.cb) {
                                         dos.writeBytes(al1.rollno + "\r\n");
@@ -614,10 +610,26 @@ public class Faculty extends javax.swing.JFrame {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
+                    } else if (s.equals("Notes History Request Accepted")) {
+                        dos.writeInt(fac.id);
+                        while (true) {
+                            String title = dis.readLine();
+                            if (title.equals("khatam")) {
+                                break;
+                            } else {
+                                int id = dis.readInt();
+                                String description = dis.readLine();
+                                String type = dis.readLine();
+                                Date d = new Date(dis.readLong());
+                                ob5.al.add(new Notes(id, title, description, type, d));
+                            }
+                        }
+                        ob5.tm = new MyTableModel((ArrayList<Object>) (Object) ob5.al);
+                        ob5.tb.setModel(ob5.tm);
+                        ob5.tm.fireTableDataChanged();
                     }
                 }
             } catch (Exception e) {
@@ -921,7 +933,8 @@ public class Faculty extends javax.swing.JFrame {
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-
+            ob5 = new ViewHistory();
+            ob5.setVisible(true);
         }
 
         private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1746,7 +1759,8 @@ public class Faculty extends javax.swing.JFrame {
         }
 
         private void btHistoryActionPerformed(java.awt.event.ActionEvent evt) {
-            // TODO add your handling code here:
+            ob5 = new ViewHistory();
+            ob5.setVisible(true);
         }
 
         private void cbDepartmentActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1839,6 +1853,79 @@ public class Faculty extends javax.swing.JFrame {
         private javax.swing.JLabel lbPath;
         private javax.swing.JTextField tfDescription;
         private javax.swing.JTextField tfTitle;
+        // End of variables declaration                   
+    }
+
+    public class ViewHistory extends javax.swing.JFrame {
+
+        MyTableModel tm;
+        ArrayList<Notes> al;
+
+        public ViewHistory() {
+            initComponents();
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            al = new ArrayList<Notes>();
+            try {
+                dos.writeBytes("Notes History Request\r\n");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Connection Lost");
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+        private void initComponents() {
+
+            jLabel1 = new javax.swing.JLabel();
+            jScrollPane1 = new javax.swing.JScrollPane();
+            tb = new javax.swing.JTable();
+
+            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+            jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+            jLabel1.setText("View Notes History");
+
+            tb.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{
+                        {},
+                        {},
+                        {},
+                        {}
+                    },
+                    new String[]{}
+            ));
+            jScrollPane1.setViewportView(tb);
+
+            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE)
+                            .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                            .addGap(206, 206, 206)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addContainerGap(25, Short.MAX_VALUE))
+            );
+
+            pack();
+        }// </editor-fold>                        
+
+        // Variables declaration - do not modify                     
+        private javax.swing.JLabel jLabel1;
+        private javax.swing.JScrollPane jScrollPane1;
+        private javax.swing.JTable tb;
         // End of variables declaration                   
     }
 

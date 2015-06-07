@@ -463,7 +463,6 @@ public class Homepage extends javax.swing.JFrame {
                                 dos.writeBytes(rs.getString("address") + "\r\n");
                                 dos.writeBytes(rs.getString("qualification") + "\r\n");
                                 boolean photo = (rs.getInt("Photo") == 0) ? false : true;
-                                System.out.println(photo);
                                 String file = "";
                                 if (!photo) {
                                     file = "C:\\pics\\default.jpg";
@@ -493,7 +492,6 @@ public class Homepage extends javax.swing.JFrame {
                             int facultyid = dis.readInt();
                             String currentpass = dis.readLine();
                             String newpass = dis.readLine();
-                            System.out.println("3");
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                             ResultSet rs = stmt.executeQuery("select * from faculty where id = " + facultyid + " and password = '" + currentpass + "'");
                             if (rs.next()) {
@@ -541,7 +539,6 @@ public class Homepage extends javax.swing.JFrame {
                             s5 = rollno;
                         }
                         long count = 0, size = dis.readLong();
-                        System.out.println("C:\\pics\\" + s3 + "\\" + s5 + ".jpg");
 
                         fos = new FileOutputStream("C:\\pics\\" + s3 + "\\" + s5 + ".jpg");
                         byte b[] = new byte[100000];
@@ -627,7 +624,28 @@ public class Homepage extends javax.swing.JFrame {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
+                    } else if (s.equals("Notes History Request")) {
+                        dos.writeBytes("Notes History Request Accepted\r\n");
+                        int facid = dis.readInt();
+                        Statement stmt = ob.conn.createStatement();
+                        ResultSet rs = stmt.executeQuery("select * from notes where PostedBy = " + facid);
+                        if (rs.next()) {
+                            dos.writeBytes(rs.getString("title") + "\r\n");
+                            dos.writeInt(rs.getInt("NoteID"));
+                            dos.writeBytes(rs.getString("description") + "\r\n");
+                            dos.writeBytes(rs.getString("type") + "\r\n");
+                            dos.writeLong(rs.getLong("time"));
+                            while (rs.next()) {
+                                dos.writeBytes(rs.getString("title") + "\r\n");
+                                dos.writeInt(rs.getInt("NoteID"));
+                                dos.writeBytes(rs.getString("description") + "\r\n");
+                                dos.writeBytes(rs.getString("type") + "\r\n");
+                                dos.writeLong(rs.getLong("time"));
+                            }
+                            dos.writeBytes("khatam\r\n");
+                        } else {
+                            dos.writeBytes("khatam\r\n");
+                        }
                     } else if (s.equals("Register Student Request")) {
                         try {
                             dos.writeBytes("Register Student Request Accepted\r\n");
@@ -729,7 +747,6 @@ public class Homepage extends javax.swing.JFrame {
 
                             int rs = stmt.executeUpdate("update student set email='" + email + "' ,contact='" + contact + "' ,address='" + address + "' where rollno='" + rollno + "'");
 
-                            System.out.println(rs);
                             if (rs == 1) {
                                 dos.writeBytes("Profile Updated Successfully\r\n");
                             } else {
