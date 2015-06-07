@@ -570,15 +570,8 @@ public class Faculty extends javax.swing.JFrame {
                             dos.writeInt(fac.id);
                             Date d = new Date();
                             dos.writeLong(d.getTime());
-                            String s2 = "";
-                            for (int i = 0; i < al.size(); i++) {
-                                if (al.get(i).cb) {
-                                    s2 = s2 + al.get(i).rollno + " ";
-                                }
-                            }
-                            s2 = s2 + "dummy";
+
                             String s3 = ob4.lbPath.getText();
-                            System.out.println(s2);
                             try {
                                 f = new File(s3);
                                 long size = f.length();
@@ -588,7 +581,7 @@ public class Faculty extends javax.swing.JFrame {
                                 System.out.println(s1);
                                 dos.writeBytes(s1 + "\r\n");
                                 System.out.println("size" + size);
-                                dos.writeBytes(s2 + "\r\n");
+
                                 if (dis.readLine().equals("Get Notes File")) {
                                     fis = new FileInputStream(f);
                                     byte b[] = new byte[1000000];
@@ -607,8 +600,16 @@ public class Faculty extends javax.swing.JFrame {
                                     fis.close();
                                 }
                                 Thread.sleep(1000);
+
+                                for (StudentData al1 : al) {
+                                    if (al1.cb) {
+                                        dos.writeBytes(al1.rollno + "\r\n");
+                                    }
+                                }
+                                dos.writeBytes("khatam\r\n");
                                 if (dis.readLine().equals("Notes Added Successfully")) {
                                     JOptionPane.showMessageDialog(ob4, "Notes Added Successfully");
+                                    ob4.dispose();
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();

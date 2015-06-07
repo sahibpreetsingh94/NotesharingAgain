@@ -612,15 +612,14 @@ public class Homepage extends javax.swing.JFrame {
                                         }
                                     }
                                     fos.close();
-                                    StringTokenizer s3 = new StringTokenizer(s4);
-                                    System.out.println(s3.countTokens());
-                                    System.out.println(s4);
-                                    for (int i = 0; i < s3.countTokens(); i++) {
-                                        System.out.println(s3.nextToken());
-                                        //System.out.println(rollno);
-                                        //System.out.println("insert into notesdetails (NoteID , StudentRollNo) values (" + noteid + " , '" + rollno + "')");
-                                        //Statement stmt3 = ob.conn.createStatement();
-                                        //stmt3.executeUpdate("insert into notesdetails (NoteID , StudentRollNo) values (" + noteid + " , '" + s3.nextToken() + "')");
+                                    while (true) {
+                                        String rollno = dis.readLine();
+                                        if (!rollno.equals("khatam")) {
+                                            Statement stmt3 = ob.conn.createStatement();
+                                            stmt3.executeUpdate("insert into notesdetails (NoteID , StudentRollNo) values (" + noteid + " , '" + rollno + "')");
+                                        } else {
+                                            break;
+                                        }
                                     }
                                     dos.writeBytes("Notes Added Successfully\r\n");
                                 }
