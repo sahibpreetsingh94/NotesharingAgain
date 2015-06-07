@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -342,9 +343,7 @@ public class Faculty extends javax.swing.JFrame {
         } else {
             if (passwordtf.getText().equals(confirmtf.getText())) {
                 try {
-                    System.out.println("hello1");
                     dos.writeBytes("Register Faculty Request\r\n");
-                    System.out.println("hello2");
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Unable to send register request");
                 }
@@ -381,13 +380,14 @@ public class Faculty extends javax.swing.JFrame {
 
     class Receiver implements Runnable {
 
+        private File f;
+
         @Override
         public void run() {
             facultypan.setVisible(true);
             try {
                 while (true) {
                     String s = dis.readLine();
-                    System.out.println(s);
                     if (s.equals("Department March")) {
                         String s5 = dis.readLine();
                         if (s5.equals("Homepage Data")) {
@@ -425,9 +425,7 @@ public class Faculty extends javax.swing.JFrame {
                                 } else {
                                     coursecb.addItem(s1);
                                 }
-                                System.out.println(s1);
                             }
-                            System.out.println("heelo");
                         } else if (s2.equals("AddNotes")) {
                             ob4.cbCourse.removeAllItems();
                             ob4.cbCourse.addItem("Select Course");
@@ -440,15 +438,12 @@ public class Faculty extends javax.swing.JFrame {
                                 }
                             }
                         }
-                        System.out.println("heelo231223");
                     } else if (s.equals("Register Faculty Request Accepted")) {
-                        System.out.println("do");
                         dos.writeBytes(nametf.getText() + "\r\n");
                         dos.writeBytes(passwordtf.getText() + "\r\n");
                         dos.writeBytes(departmentcb.getSelectedItem().toString() + "\r\n");
                         dos.writeBytes(coursecb.getSelectedItem().toString() + "\r\n");
                         Date d = new Date();
-                        System.out.println(d.getTime());
                         dos.writeLong(d.getTime());
                         String s1 = dis.readLine();
                         if (s1.equals("Registered Successfully")) {
@@ -482,7 +477,6 @@ public class Faculty extends javax.swing.JFrame {
                         fac.qualification = dis.readLine();
                         long count = 0, size = dis.readLong();
                         fos = new FileOutputStream("C:\\pics1\\" + fac.id + ".jpg");
-                        System.out.println(size);
                         byte[] b = new byte[100000];
                         int r;
                         while (count != size) {
@@ -553,8 +547,9 @@ public class Faculty extends javax.swing.JFrame {
 
                         }
                     } else if (s.equals("Request Student Data Accepted")) {
-                        dos.writeBytes(ob4.cbDepartment.getSelectedItem().toString() + "\r\n");
-                        dos.writeBytes(ob4.cbCourse.getSelectedItem().toString() + "\r\n");
+                        dos.writeBytes(ob4.cbDepartment.getSelectedItem() + "\r\n");
+                        dos.writeBytes(ob4.cbCourse.getSelectedItem() + "\r\n");
+                        al.removeAll(al);
                         while (true) {
                             String rollno = dis.readLine();
                             if (!rollno.equals("khatam")) {
@@ -567,6 +562,61 @@ public class Faculty extends javax.swing.JFrame {
                             }
                         }
                         ob4.tm.fireTableDataChanged();
+                    } else if (s.equals("AddNotes Request Accepted")) {
+                        try {
+                            dos.writeBytes(ob4.tfTitle.getText() + "\r\n");
+                            dos.writeBytes(ob4.tfDescription.getText() + "\r\n");
+                            dos.writeBytes(ob4.cbType.getSelectedItem() + "\r\n");
+                            dos.writeInt(fac.id);
+                            Date d = new Date();
+                            dos.writeLong(d.getTime());
+                            String s2 = "";
+                            for (int i = 0; i < al.size(); i++) {
+                                if (al.get(i).cb) {
+                                    s2 = s2 + al.get(i).rollno + " ";
+                                }
+                            }
+                            s2 = s2 + "dummy";
+                            String s3 = ob4.lbPath.getText();
+                            System.out.println(s2);
+                            try {
+                                f = new File(s3);
+                                long size = f.length();
+                                dos.writeLong(size);
+                                int i = s3.lastIndexOf(".");
+                                String s1 = s3.substring(i);
+                                System.out.println(s1);
+                                dos.writeBytes(s1 + "\r\n");
+                                System.out.println("size" + size);
+                                dos.writeBytes(s2 + "\r\n");
+                                if (dis.readLine().equals("Get Notes File")) {
+                                    fis = new FileInputStream(f);
+                                    byte b[] = new byte[1000000];
+                                    int r;
+                                    int count = 0;
+                                    while (true) {
+                                        r = fis.read(b, 0, 1000000);
+                                        count = count + r;
+                                        System.out.println("count");
+                                        if (r == -1) {
+                                            System.out.println("in break");
+                                            break;
+                                        }
+                                        dos.write(b, 0, r);
+                                    }
+                                    fis.close();
+                                }
+                                Thread.sleep(1000);
+                                if (dis.readLine().equals("Notes Added Successfully")) {
+                                    JOptionPane.showMessageDialog(ob4, "Notes Added Successfully");
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } catch (Exception e) {
+
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -1368,7 +1418,6 @@ public class Faculty extends javax.swing.JFrame {
 
         public AddNotes() {
             initComponents();
-            setSize(500, 600);
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             al = new ArrayList<StudentData>();
             tm = new TableModel();
@@ -1376,7 +1425,6 @@ public class Faculty extends javax.swing.JFrame {
             try {
                 dos.writeBytes("Request Department\r\n");
                 dos.writeBytes("AddNotes Data\r\n");
-                System.out.println("789");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1412,63 +1460,55 @@ public class Faculty extends javax.swing.JFrame {
             btDeselect = new javax.swing.JButton();
 
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-            getContentPane().setLayout(null);
 
+            jLabel1.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel1.setText("Department");
-            getContentPane().add(jLabel1);
-            jLabel1.setBounds(30, 80, 90, 20);
 
+            jLabel2.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel2.setText("Course");
-            getContentPane().add(jLabel2);
-            jLabel2.setBounds(30, 110, 50, 20);
 
+            jLabel3.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel3.setText("Title");
-            getContentPane().add(jLabel3);
-            jLabel3.setBounds(30, 150, 40, 20);
 
+            jLabel4.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel4.setText("Description");
-            getContentPane().add(jLabel4);
-            jLabel4.setBounds(30, 190, 90, 20);
 
+            jLabel5.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel5.setText("Type");
-            getContentPane().add(jLabel5);
-            jLabel5.setBounds(30, 230, 40, 20);
 
+            jLabel6.setFont(new java.awt.Font("Tekton Pro", 0, 18)); // NOI18N
             jLabel6.setText("Select File");
-            getContentPane().add(jLabel6);
-            jLabel6.setBounds(30, 280, 80, 20);
 
+            cbDepartment.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             cbDepartment.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select Department"}));
-            getContentPane().add(cbDepartment);
-            cbDepartment.setBounds(130, 70, 170, 30);
             cbDepartment.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     cbDepartmentActionPerformed(evt);
                 }
             });
 
+            cbCourse.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             cbCourse.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select Course"}));
             cbCourse.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     cbCourseActionPerformed(evt);
                 }
             });
-            getContentPane().add(cbCourse);
-            cbCourse.setBounds(130, 100, 170, 30);
-            getContentPane().add(tfTitle);
-            tfTitle.setBounds(130, 140, 170, 30);
-            getContentPane().add(tfDescription);
-            tfDescription.setBounds(130, 180, 170, 30);
 
+            cbType.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             cbType.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Select type"}));
             cbType.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent evt) {
                     cbTypeItemStateChanged(evt);
                 }
             });
-            getContentPane().add(cbType);
-            cbType.setBounds(130, 230, 120, 30);
+            cbType.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    cbTypeActionPerformed(evt);
+                }
+            });
 
+            btBrowse.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             btBrowse.setText("Browse");
             btBrowse.setEnabled(false);
             btBrowse.addActionListener(new java.awt.event.ActionListener() {
@@ -1476,8 +1516,6 @@ public class Faculty extends javax.swing.JFrame {
                     btBrowseActionPerformed(evt);
                 }
             });
-            getContentPane().add(btBrowse);
-            btBrowse.setBounds(330, 283, 90, 30);
 
             jTable1.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
@@ -1490,46 +1528,137 @@ public class Faculty extends javax.swing.JFrame {
             ));
             jScrollPane1.setViewportView(jTable1);
 
-            getContentPane().add(jScrollPane1);
-            jScrollPane1.setBounds(20, 330, 410, 120);
-
-            jLabel7.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+            jLabel7.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
             jLabel7.setText("Add Notes");
-            getContentPane().add(jLabel7);
-            jLabel7.setBounds(150, 10, 140, 30);
 
+            btAdd.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             btAdd.setText("Add");
             btAdd.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     btAddActionPerformed(evt);
                 }
             });
-            getContentPane().add(btAdd);
-            btAdd.setBounds(210, 540, 51, 23);
-            getContentPane().add(lbPath);
-            lbPath.setBounds(130, 280, 190, 30);
 
+            btHistory.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             btHistory.setText("View History");
-            getContentPane().add(btHistory);
-            btHistory.setBounds(293, 20, 120, 30);
+            btHistory.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btHistoryActionPerformed(evt);
+                }
+            });
 
+            btSelect.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             btSelect.setText("Select All");
             btSelect.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     btSelectActionPerformed(evt);
                 }
             });
-            getContentPane().add(btSelect);
-            btSelect.setBounds(60, 460, 90, 30);
 
+            btDeselect.setFont(new java.awt.Font("Microsoft Himalaya", 0, 24)); // NOI18N
             btDeselect.setText("Deselect All");
             btDeselect.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     btDeselectActionPerformed(evt);
                 }
             });
-            getContentPane().add(btDeselect);
-            btDeselect.setBounds(283, 460, 110, 30);
+
+            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addGap(165, 165, 165)
+                                                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addContainerGap()
+                                                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addGap(60, 60, 60)
+                                                            .addComponent(btSelect)
+                                                            .addGap(128, 128, 128)
+                                                            .addComponent(btDeselect, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addContainerGap()
+                                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                    .addComponent(jLabel1)
+                                                                    .addComponent(jLabel2)
+                                                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                            .addGap(72, 72, 72)
+                                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                    .addComponent(cbCourse, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                    .addComponent(cbDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                    .addComponent(tfTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                            .addComponent(cbType, 0, 170, Short.MAX_VALUE)
+                                                                            .addComponent(tfDescription))
+                                                                    .addGroup(layout.createSequentialGroup()
+                                                                            .addComponent(lbPath, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                            .addGap(18, 18, 18)
+                                                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                    .addComponent(btHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                    .addComponent(btBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                                    .addGroup(layout.createSequentialGroup()
+                                                            .addContainerGap()
+                                                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                            .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                            .addGap(194, 194, 194)
+                            .addComponent(btAdd)
+                            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            layout.setVerticalGroup(
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(31, 31, 31))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(btHistory, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(18, 18, 18)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(cbDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbCourse, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(cbType, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lbPath, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(30, 30, 30)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btDeselect, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(14, 14, 14)
+                            .addComponent(btAdd)
+                            .addGap(36, 36, 36))
+            );
 
             pack();
         }// </editor-fold>                        
@@ -1569,7 +1698,16 @@ public class Faculty extends javax.swing.JFrame {
         }
 
         private void btAddActionPerformed(java.awt.event.ActionEvent evt) {
-
+            String s1 = ob4.lbPath.getText();
+            if (s1.equals("")) {
+                JOptionPane.showMessageDialog(ob4, "No File Selected");
+            } else {
+                try {
+                    dos.writeBytes("AddNotes Request\r\n");
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Connection Lost");
+                }
+            }
         }
 
         private void cbTypeItemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1580,36 +1718,48 @@ public class Faculty extends javax.swing.JFrame {
             }
         }
 
+        private void btSelectActionPerformed(java.awt.event.ActionEvent evt) {
+            for (int i = 0; i < al.size(); i++) {
+                al.get(i).cb = true;
+            }
+            tm.fireTableDataChanged();
+        }
+
+        private void btDeselectActionPerformed(java.awt.event.ActionEvent evt) {
+            for (int i = 0; i < al.size(); i++) {
+                al.get(i).cb = false;
+            }
+            tm.fireTableDataChanged();
+        }
+
+        private void cbCourseActionPerformed(java.awt.event.ActionEvent evt) {
+            try {
+                dos.writeBytes("Request Student Data\r\n");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Connection Lost");
+            }
+        }
+
+        private void cbTypeActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+
+        private void btHistoryActionPerformed(java.awt.event.ActionEvent evt) {
+            // TODO add your handling code here:
+        }
+
         private void cbDepartmentActionPerformed(java.awt.event.ActionEvent evt) {
             try {
                 if (cbDepartment.getSelectedIndex() != 0) {
                     dos.writeBytes("Request Course\r\n");
                     dos.writeBytes(cbDepartment.getSelectedItem() + "\r\n");
                     dos.writeBytes("AddNotes\r\n");
-                    System.out.println("456");
                 } else {
                     cbCourse.removeAllItems();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        private void cbCourseActionPerformed(java.awt.event.ActionEvent evt) {
-            System.out.println("123");
-            try {
-                //dos.writeBytes("Request Student Data\r\n");
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Connection Lost");
-            }
-        }
-
-        private void btSelectActionPerformed(java.awt.event.ActionEvent evt) {
-
-        }
-
-        private void btDeselectActionPerformed(java.awt.event.ActionEvent evt) {
-
         }
 
         class TableModel extends AbstractTableModel {

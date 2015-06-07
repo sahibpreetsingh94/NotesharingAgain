@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
+import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
 /**
@@ -409,14 +410,12 @@ public class Homepage extends javax.swing.JFrame {
                         }
                     } else if (s.equals("Register Faculty Request")) {
                         try {
-                            System.out.println(1);
                             dos.writeBytes("Register Faculty Request Accepted\r\n");
                             String name = dis.readLine();
                             String password = dis.readLine();
                             String department = dis.readLine();
                             String course = dis.readLine();
                             long time = dis.readLong();
-                            System.out.println("insert into faculty (name, password, department, course, email, contact, address, qualification, time) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' , '' , '' , '' , '' ," + time + ")");
                             Statement stmt = ob.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                             int rs = stmt.executeUpdate("insert into faculty (username, password, department, course, email, contact, address, qualification, timestamp) values ('" + name + "' , '" + password + "' , '" + department + "' , '" + course + "' , '' , '' , '' , '' ," + time + ")");
                             if (rs == 1) {
@@ -581,6 +580,55 @@ public class Homepage extends javax.swing.JFrame {
                         } else {
                             dos.writeBytes("khatam\r\n");
                         }
+                    } else if (s.equals("AddNotes Request")) {
+                        try {
+                            dos.writeBytes("AddNotes Request Accepted\r\n");
+                            String title = dis.readLine();
+                            String description = dis.readLine();
+                            String type = dis.readLine();
+                            int facultyID = dis.readInt();
+                            long time = dis.readLong();
+                            long size = dis.readLong();
+                            String sub = dis.readLine();
+                            String s4 = dis.readLine();
+                            Statement stmt = ob.conn.createStatement();
+                            int rs = stmt.executeUpdate("insert into notes (title, description, type, time, postedBy) values ('" + title + "' , '" + description + "' , '" + type + "' , '" + time + "' , '" + facultyID + "')");
+                            if (rs == 1) {
+                                Statement stmt1 = ob.conn.createStatement();
+                                ResultSet rs1 = stmt1.executeQuery("select noteid from notes where time = " + time);
+                                if (rs1.next()) {
+                                    dos.writeBytes("Get Notes File\r\n");
+                                    int noteid = rs1.getInt("noteId");
+                                    fos = new FileOutputStream(new File(System.getProperty("user.home") + File.separator + "notes" + File.separator + noteid + "." + sub));
+                                    byte b[] = new byte[1000000];
+                                    int count = 0;
+                                    int r;
+                                    while (true) {
+                                        r = dis.read(b, 0, 1000000);
+                                        fos.write(b, 0, r);
+                                        count += r;
+                                        if (count == size) {
+                                            break;
+                                        }
+                                    }
+                                    fos.close();
+                                    StringTokenizer s3 = new StringTokenizer(s4);
+                                    System.out.println(s3.countTokens());
+                                    System.out.println(s4);
+                                    for (int i = 0; i < s3.countTokens(); i++) {
+                                        System.out.println(s3.nextToken());
+                                        //System.out.println(rollno);
+                                        //System.out.println("insert into notesdetails (NoteID , StudentRollNo) values (" + noteid + " , '" + rollno + "')");
+                                        //Statement stmt3 = ob.conn.createStatement();
+                                        //stmt3.executeUpdate("insert into notesdetails (NoteID , StudentRollNo) values (" + noteid + " , '" + s3.nextToken() + "')");
+                                    }
+                                    dos.writeBytes("Notes Added Successfully\r\n");
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     } else if (s.equals("Register Student Request")) {
                         try {
                             dos.writeBytes("Register Student Request Accepted\r\n");
